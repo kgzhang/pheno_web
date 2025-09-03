@@ -1,0 +1,54 @@
+.knowledge-graph-viewer {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+}
+
+.control-panel {
+  background: white;
+  padding: 8px;
+  border-bottom: 1px solid #e8e8e8;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  z-index: 1000;
+}
+
+.sigma-container {
+  flex: 1;
+  background: white;
+  position: relative;
+  border: 1px solid var(--main-20);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.detail-panel {
+  position: absolute;
+  width: 240px;
+  background: white;
+  border: 1px solid #e8e8e8;
+  border-radius: 6px;
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+  cursor: move;
+  z-index: 1000;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.detail-content {
+  padding: 10px;
+  max-height: 300px;
+  overflow-y: auto;
+}

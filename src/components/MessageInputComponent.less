@@ -1,0 +1,110 @@
+.input-box {
+  display: grid;
+  width: 100%;
+  margin: 0 auto;
+  border: 1px solid var(--gray-200);
+  border-radius: 0.8rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  gap: 8px;
+  padding: 0.8rem 0.75rem 0.6rem 0.75rem;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "input input"
+    "options send";
+
+  .expand-options {
+    justify-self: start;
+  }
+  .send-button-container {
+    justify-self: end;
+  }
+
+  &.single-line {
+    padding: 0.75rem 0.75rem;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+    grid-template-areas: "options input send";
+    align-items: center;
+
+    .user-input {
+      min-height: 24px;
+      height: 24px;
+      align-self: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    .expand-options, .send-button-container {
+      align-self: center;
+    }
+  }
+}
+
+.expand-options {
+  grid-area: options;
+  display: flex;
+  align-items: center;
+}
+
+.user-input {
+  grid-area: input;
+  width: 100%;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  margin: 0;
+  color: #222222;
+  font-size: 15px;
+  outline: none;
+  resize: none;
+  line-height: 1.5;
+  font-family: inherit;
+  min-height: 44px;
+  max-height: 200px;
+
+  &:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  &::placeholder {
+    color: #888888;
+  }
+}
+
+.send-button-container {
+  grid-area: send;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.send-button {
+  height: 32px;
+  width: 32px;
+  cursor: pointer;
+  background-color: var(--main-500);
+  border-radius: 50%;
+  border: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+
+  &:hover {
+    background-color: var(--main-color);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+  }
+
+  &:disabled {
+    background-color: var(--gray-400);
+    cursor: not-allowed;
+  }
+}

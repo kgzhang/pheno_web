@@ -1,0 +1,44 @@
+.add-files-content {
+  padding: 16px 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.upload-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.source-selector {
+  display: flex;
+  gap: 12px;
+}
+
+.upload-mode-selector {
+  padding: 8px 16px;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s;
+
+  &:hover {
+    border-color: var(--main-color);
+  }
+
+  &.active {
+    border-color: var(--main-color);
+    background-color: var(--main-30);
+    color: var(--main-color);
+  }
+}
+
+.ocr-config,
+.qa-split-config {
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: var(--gray-50);
+  border-radius: 6px;
+}

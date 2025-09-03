@@ -1,0 +1,52 @@
+.setting-container {
+  padding: 0;
+}
+
+.setting-container-body {
+  display: flex;
+  min-height: calc(100vh - 65px);
+}
+
+.sider {
+  width: 200px;
+  padding: 20px;
+  border-right: 1px solid var(--main-20);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .ant-btn {
+    width: 100%;
+    text-align: left;
+    &.activesec {
+      background: var(--gray-200);
+      color: var(--gray-900);
+    }
+  }
+}
+
+.setting {
+  flex: 1;
+  padding: 20px;
+
+  h3 {
+    margin-top: 20px;
+  }
+
+  .section {
+    margin-top: 20px;
+    background-color: var(--gray-0);
+    padding: 20px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    border: 1px solid var(--gray-200);
+  }
+
+  .card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+}

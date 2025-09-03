@@ -1,0 +1,46 @@
+.graph-section {
+  &.collapsed {
+    height: 36px;
+    flex: none;
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    background-color: #fafafa;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .graph-stats {
+    display: flex;
+    gap: 8px;
+  }
+
+  .panel-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .graph-container-compact {
+    flex: 1;
+    min-height: 0;
+    padding: 0;
+    height: 100%;
+    border-radius: 0;
+  }
+}
