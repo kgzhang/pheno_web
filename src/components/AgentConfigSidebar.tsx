@@ -1,8 +1,21 @@
 import React, { useState } from 'react'
-import { Button, Switch, Select, Input, Form, message, Modal, Tag } from 'antd'
-import { SettingOutlined, CloseOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import { Switch } from '@/components/ui/switch'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Badge } from '@/components/ui/badge'
+import { Settings, X } from 'lucide-react'
 import ModelSelectorComponent from './ModelSelectorComponent'
 import { useAgentStore } from '@/stores/agentStore'
+import { message } from '@/utils/toast'
 import './AgentConfigSidebar.less'
 
 interface AgentConfigSidebarProps {
@@ -36,16 +49,19 @@ const AgentConfigSidebar: React.FC<AgentConfigSidebarProps> = ({ isOpen, onClose
     <div className={`agent-config-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <div className="sidebar-title">
-          <SettingOutlined />
+          <Settings className="h-4 w-4" />
           <span>{selectedAgent?.name} 配置</span>
         </div>
-        <Button type="text" size="small" onClick={onClose} icon={<CloseOutlined />} />
+        <Button variant="ghost" size="icon" onClick={onClose}>
+          <X className="h-4 w-4" />
+        </Button>
       </div>
       <div className="sidebar-content">
-        {selectedAgent && (
-          <Form layout="vertical">
+        {selectedAgent() ? (
+          <div className="space-y-4">
             {Object.entries(configurableItems).map(([key, value]: [string, any]) => (
-              <Form.Item key={key} label={value.name || key}>
+              <div key={key} className="space-y-2">
+                <Label>{value.name || key}</Label>
                 {value.template_metadata?.kind === 'llm' ? (
                   <ModelSelectorComponent
                     onSelectModel={({ provider, name }) =>
@@ -54,32 +70,37 @@ const AgentConfigSidebar: React.FC<AgentConfigSidebarProps> = ({ isOpen, onClose
                     model_name={agentConfig[key]?.split('/')[1]}
                     model_provider={agentConfig[key]?.split('/')[0]}
                   />
-                ) : value.template_metadata?.kind === 'tools' ? (
+                ) : value.template_metadata && value.template_metadata.kind === 'tools' ? (
                   <>
                     <Button onClick={() => setToolsModalOpen(true)}>选择工具</Button>
-                    <div className="selected-tools-preview">
+                    <div className="selected-tools-preview flex flex-wrap gap-1">
                       {agentConfig[key]?.map((toolId: string) => (
-                        <Tag key={toolId}>
+                        <Badge key={toolId} variant="secondary">
                           {availableTools.find((t: any) => t.id === toolId)?.name}
-                        </Tag>
+                        </Badge>
                       ))}
                     </div>
                   </>
                 ) : typeof agentConfig[key] === 'boolean' ? (
                   <Switch
                     checked={agentConfig[key]}
-                    onChange={(checked) => updateAgentConfig({ [key]: checked })}
+                    onCheckedChange={(checked: boolean) => updateAgentConfig({ [key]: checked })}
                   />
                 ) : value.options ? (
                   <Select
                     value={agentConfig[key]}
-                    onChange={(val) => updateAgentConfig({ [key]: val })}
+                    onValueChange={(val) => updateAgentConfig({ [key]: val })}
                   >
-                    {value.options.map((opt: string) => (
-                      <Select.Option key={opt} value={opt}>
-                        {opt}
-                      </Select.Option>
-                    ))}
+                    <SelectTrigger>
+                      <SelectValue placeholder="请选择" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {value.options.map((opt: string) => (
+                        <SelectItem key={opt} value={opt}>
+                          {opt}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 ) : (
                   <Input
@@ -87,34 +108,52 @@ const AgentConfigSidebar: React.FC<AgentConfigSidebarProps> = ({ isOpen, onClose
                     onChange={(e) => updateAgentConfig({ [key]: e.target.value })}
                   />
                 )}
-              </Form.Item>
+              </div>
             ))}
-          </Form>
-        )}
+          </div>
+        ) : null}
       </div>
       <div className="sidebar-footer">
-        <Button onClick={handleSave} type="primary">
-          保存配置
+        <Button onClick={handleSave}>保存配置</Button>
+        <Button variant="outline" onClick={resetAgentConfig}>
+          重置
         </Button>
-        <Button onClick={resetAgentConfig}>重置</Button>
       </div>
-      <Modal
-        open={toolsModalOpen}
-        title="选择工具"
-        onCancel={() => setToolsModalOpen(false)}
-        onOk={() => {
-          updateAgentConfig({ tools: selectedTools })
-          setToolsModalOpen(false)
-        }}
-      >
-        <Select
-          mode="multiple"
-          value={selectedTools}
-          onChange={setSelectedTools}
-          style={{ width: '100%' }}
-          options={availableTools.map((tool: any) => ({ label: tool.name, value: tool.id }))}
-        />
-      </Modal>
+      <Dialog open={toolsModalOpen} onOpenChange={setToolsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>选择工具</DialogTitle>
+          </DialogHeader>
+          <Select
+            value={selectedTools}
+            onValueChange={(value) => setSelectedTools(Array.isArray(value) ? value : [value])}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="请选择工具" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableTools.map((tool: any) => (
+                <SelectItem key={tool.id} value={tool.id}>
+                  {tool.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setToolsModalOpen(false)}>
+              取消
+            </Button>
+            <Button
+              onClick={() => {
+                updateAgentConfig({ tools: selectedTools })
+                setToolsModalOpen(false)
+              }}
+            >
+              确认
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

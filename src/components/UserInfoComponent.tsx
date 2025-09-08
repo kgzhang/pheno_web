@@ -1,9 +1,16 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Avatar, Dropdown, Button, Modal } from 'antd'
-import { UserOutlined, LogoutOutlined, SettingOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { Settings, LogOut, User } from 'lucide-react'
 import { useUserStore } from '@/stores/userStore'
-import './UserInfoComponent.less'
 
 interface UserInfoComponentProps {
   showButton?: boolean
@@ -12,44 +19,49 @@ interface UserInfoComponentProps {
 const UserInfoComponent: React.FC<UserInfoComponentProps> = ({ showButton = false }) => {
   const navigate = useNavigate()
   const { username, logout, isLoggedIn } = useUserStore()
-  const [isModalVisible, setIsModalVisible] = useState(false)
 
   const handleLogout = () => {
     logout()
     navigate('/login')
   }
 
-  const menu = (
-    <div className="user-menu">
-      <div className="user-info">
-        <Avatar size={40} icon={<UserOutlined />} />
-        <div className="user-details">
-          <div className="username">{username}</div>
-        </div>
-      </div>
-      <div className="menu-item" onClick={() => navigate('/setting')}>
-        <SettingOutlined /> 设置
-      </div>
-      <div className="menu-item" onClick={handleLogout}>
-        <LogoutOutlined /> 退出登录
-      </div>
-    </div>
-  )
-
   if (!isLoggedIn()) {
     return showButton ? (
-      <Button type="primary" onClick={() => navigate('/login')}>
+      <Button variant="default" onClick={() => navigate('/login')}>
         登录
       </Button>
     ) : null
   }
 
   return (
-    <Dropdown overlay={menu} trigger={['click']}>
-      <div className="user-avatar-container">
-        <Avatar size={32} icon={<UserOutlined />} />
-      </div>
-    </Dropdown>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground cursor-pointer">
+          <User className="h-4 w-4" />
+        </div>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-56">
+        <DropdownMenuLabel>
+          <div className="flex items-center gap-2 p-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground">
+              <User className="h-4 w-4" />
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium">{username}</span>
+            </div>
+          </div>
+        </DropdownMenuLabel>
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate('/setting')}>
+          <Settings className="mr-2 h-4 w-4" />
+          <span>设置</span>
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={handleLogout}>
+          <LogOut className="mr-2 h-4 w-4" />
+          <span>退出登录</span>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
 

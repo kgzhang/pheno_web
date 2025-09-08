@@ -1,19 +1,41 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Form, Input, Button, Checkbox, message, Tooltip } from 'antd'
-import {
-  UserOutlined,
-  LockOutlined,
-  WechatOutlined,
-  QrcodeOutlined,
-  ThunderboltOutlined,
-  ExclamationCircleOutlined
-} from '@ant-design/icons'
 import { useUserStore } from '@/stores/userStore'
 import { useInfoStore } from '@/stores/infoStore'
 import { useAgentStore } from '@/stores/agentStore'
 import { healthApi } from '@/apis/system_api'
-import './LoginView.less'
+import { message } from '@/utils/toast'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage
+} from '@/components/ui/form'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import * as z from 'zod'
+import { AlertCircle, MessageCircle, QrCode, Zap } from 'lucide-react'
+
+const loginSchema = z.object({
+  username: z.string().min(1, '请输入用户名'),
+  password: z.string().min(1, '请输入密码')
+})
+
+const initializeSchema = z
+  .object({
+    username: z.string().min(1, '请输入用户名'),
+    password: z.string().min(1, '请输入密码'),
+    confirmPassword: z.string().min(1, '请确认密码')
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: '两次输入的密码不一致',
+    path: ['confirmPassword']
+  })
 
 const LoginView: React.FC = () => {
   const navigate = useNavigate()
@@ -27,6 +49,23 @@ const LoginView: React.FC = () => {
   const [serverStatus, setServerStatus] = useState('loading')
   const [serverError, setServerError] = useState('')
   const [healthChecking, setHealthChecking] = useState(false)
+
+  const loginForm = useForm<z.infer<typeof loginSchema>>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      username: '',
+      password: ''
+    }
+  })
+
+  const initializeForm = useForm<z.infer<typeof initializeSchema>>({
+    resolver: zodResolver(initializeSchema),
+    defaultValues: {
+      username: '',
+      password: '',
+      confirmPassword: ''
+    }
+  })
 
   const loginBgImage = organization()?.login_bg || '/login-bg.jpg'
 
@@ -58,7 +97,7 @@ const LoginView: React.FC = () => {
     loadInfoConfig()
   }, [isLoggedIn, navigate, checkFirstRun, loadInfoConfig])
 
-  const handleLogin = async (values: any) => {
+  const handleLogin = async (values: z.infer<typeof loginSchema>) => {
     try {
       setLoading(true)
       setErrorMessage('')
@@ -94,14 +133,10 @@ const LoginView: React.FC = () => {
     }
   }
 
-  const handleInitialize = async (values: any) => {
+  const handleInitialize = async (values: z.infer<typeof initializeSchema>) => {
     try {
       setLoading(true)
       setErrorMessage('')
-      if (values.password !== values.confirmPassword) {
-        setErrorMessage('两次输入的密码不一致')
-        return
-      }
       await initialize(values)
       message.success('管理员账户创建成功')
       navigate('/')
@@ -117,162 +152,194 @@ const LoginView: React.FC = () => {
   }
 
   return (
-    <div className={`login-view ${serverStatus === 'error' ? 'has-alert' : ''}`}>
+    <div className={`min-h-screen ${serverStatus === 'error' ? 'pt-16' : ''}`}>
       {serverStatus === 'error' && (
-        <div className="server-status-alert">
-          <div className="alert-content">
-            <ExclamationCircleOutlined className="alert-icon" />
-            <div className="alert-text">
-              <div className="alert-title">服务端连接失败</div>
-              <div className="alert-message">{serverError}</div>
+        <div className="fixed top-0 left-0 right-0 bg-destructive text-destructive-foreground p-4 z-50">
+          <div className="flex items-center justify-between max-w-7xl mx-auto">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5" />
+              <div>
+                <div className="font-semibold">服务端连接失败</div>
+                <div className="text-sm">{serverError}</div>
+              </div>
             </div>
-            <Button type="link" size="small" onClick={checkServerHealth} loading={healthChecking}>
+            <Button variant="ghost" size="sm" onClick={checkServerHealth} loading={healthChecking}>
               重试
             </Button>
           </div>
         </div>
       )}
-      <div className="login-layout">
-        <div className="login-image-section">
-          <img src={loginBgImage} alt="登录背景" className="login-bg-image" />
-          <div className="image-overlay">
-            <div className="brand-info">
-              <h1 className="brand-title">{branding()?.name || 'Yuxi-Know'}</h1>
-              <p className="brand-subtitle">
+      <div className="flex h-screen">
+        <div className="hidden lg:block flex-1 relative">
+          <img src={loginBgImage} alt="登录背景" className="w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-black/50 flex flex-col justify-between p-8">
+            <div className="text-white">
+              <h1 className="text-4xl font-bold">{branding()?.name || 'Yuxi-Know'}</h1>
+              <p className="text-xl mt-2 text-gray-300">
                 {branding()?.subtitle || '大模型驱动的知识库管理工具'}
               </p>
-              <p className="brand-description">
+              <p className="mt-4 text-gray-300">
                 {branding()?.description || '结合知识库与知识图谱，提供更准确、更全面的回答'}
               </p>
             </div>
-            <div className="brand-copyright">
+            <div className="text-gray-300 text-sm">
               <p>
                 {footer()?.copyright || 'Yuxi-Know'}. {branding()?.copyright || '版权所有'}
               </p>
             </div>
           </div>
         </div>
-        <div className="login-form-section">
-          <div className="login-container">
-            <div className="login-logo">
-              <h1>欢迎登录 {branding().name}</h1>
+        <div className="flex-1 flex items-center justify-center p-8">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <h1 className="text-2xl font-bold">欢迎登录 {branding()?.name}</h1>
             </div>
             {isFirstRun ? (
-              <div className="login-form">
-                <h2>系统初始化</h2>
-                <p className="init-desc">系统首次运行，请创建超级管理员账户：</p>
-                <Form onFinish={handleInitialize} layout="vertical">
-                  <Form.Item
-                    label="用户名"
-                    name="username"
-                    rules={[{ required: true, message: '请输入用户名' }]}
+              <div className="space-y-6">
+                <div className="text-center">
+                  <h2 className="text-xl font-semibold">系统初始化</h2>
+                  <p className="text-muted-foreground mt-2">系统首次运行，请创建超级管理员账户：</p>
+                </div>
+                <Form {...initializeForm}>
+                  <form
+                    onSubmit={initializeForm.handleSubmit(handleInitialize)}
+                    className="space-y-4"
                   >
-                    <Input prefix={<UserOutlined />} />
-                  </Form.Item>
-                  <Form.Item
-                    label="密码"
-                    name="password"
-                    rules={[{ required: true, message: '请输入密码' }]}
-                  >
-                    <Input.Password prefix={<LockOutlined />} />
-                  </Form.Item>
-                  <Form.Item
-                    label="确认密码"
-                    name="confirmPassword"
-                    rules={[
-                      { required: true, message: '请确认密码' },
-                      ({ getFieldValue }) => ({
-                        validator(_, value) {
-                          if (!value || getFieldValue('password') === value) {
-                            return Promise.resolve()
-                          }
-                          return Promise.reject(new Error('两次输入的密码不一致'))
-                        }
-                      })
-                    ]}
-                  >
-                    <Input.Password prefix={<LockOutlined />} />
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={loading} block>
+                    <FormField
+                      control={initializeForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>用户名</FormLabel>
+                          <FormControl>
+                            <Input placeholder="请输入用户名" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={initializeForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>密码</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="请输入密码" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={initializeForm.control}
+                      name="confirmPassword"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>确认密码</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="请确认密码" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" className="w-full" loading={loading}>
                       创建管理员账户
                     </Button>
-                  </Form.Item>
+                  </form>
                 </Form>
               </div>
             ) : (
-              <div className="login-form">
-                <Form onFinish={handleLogin} layout="vertical">
-                  <Form.Item
-                    label="用户名"
-                    name="username"
-                    rules={[{ required: true, message: '请输入用户名' }]}
-                  >
-                    <Input prefix={<UserOutlined />} />
-                  </Form.Item>
-                  <Form.Item
-                    label="密码"
-                    name="password"
-                    rules={[{ required: true, message: '请输入密码' }]}
-                  >
-                    <Input.Password prefix={<LockOutlined />} />
-                  </Form.Item>
-                  <Form.Item>
-                    <div className="login-options">
-                      <Checkbox onChange={showDevMessage}>记住我</Checkbox>
-                      <a className="forgot-password" onClick={showDevMessage}>
+              <div className="space-y-6">
+                <Form {...loginForm}>
+                  <form onSubmit={loginForm.handleSubmit(handleLogin)} className="space-y-4">
+                    <FormField
+                      control={loginForm.control}
+                      name="username"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>用户名</FormLabel>
+                          <FormControl>
+                            <Input placeholder="请输入用户名" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={loginForm.control}
+                      name="password"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>密码</FormLabel>
+                          <FormControl>
+                            <Input type="password" placeholder="请输入密码" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox id="remember" onCheckedChange={showDevMessage} />
+                        <label htmlFor="remember" className="text-sm cursor-pointer">
+                          记住我
+                        </label>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={showDevMessage}
+                        className="text-sm text-primary hover:underline"
+                      >
                         忘记密码?
-                      </a>
+                      </button>
                     </div>
-                  </Form.Item>
-                  <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={loading} block>
+                    <Button type="submit" className="w-full" loading={loading}>
                       登录
                     </Button>
-                  </Form.Item>
-                  <div className="third-party-login">
-                    <div className="divider">
-                      <span>其他登录方式</span>
-                    </div>
-                    <div className="login-icons">
-                      <Tooltip title="微信登录">
-                        <Button
-                          shape="circle"
-                          className="login-icon"
-                          onClick={showDevMessage}
-                          icon={<WechatOutlined />}
-                        />
-                      </Tooltip>
-                      <Tooltip title="企业微信登录">
-                        <Button
-                          shape="circle"
-                          className="login-icon"
-                          onClick={showDevMessage}
-                          icon={<QrcodeOutlined />}
-                        />
-                      </Tooltip>
-                      <Tooltip title="飞书登录">
-                        <Button
-                          shape="circle"
-                          className="login-icon"
-                          onClick={showDevMessage}
-                          icon={<ThunderboltOutlined />}
-                        />
-                      </Tooltip>
-                    </div>
-                  </div>
+                  </form>
                 </Form>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">其他登录方式</span>
+                  </div>
+                </div>
+                <div className="flex justify-center gap-4">
+                  <Button variant="outline" size="icon" onClick={showDevMessage}>
+                    <MessageCircle className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={showDevMessage}>
+                    <QrCode className="h-4 w-4" />
+                  </Button>
+                  <Button variant="outline" size="icon" onClick={showDevMessage}>
+                    <Zap className="h-4 w-4" />
+                  </Button>
+                </div>
               </div>
             )}
-            {errorMessage && <div className="error-message">{errorMessage}</div>}
-            <div className="login-footer">
-              <a href="https://github.com/xerrors" target="_blank" rel="noopener noreferrer">
+            {errorMessage && (
+              <div className="mt-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md">
+                {errorMessage}
+              </div>
+            )}
+            <div className="mt-8 flex justify-center gap-6 text-sm text-muted-foreground">
+              <a
+                href="https://github.com/xerrors"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:underline"
+              >
                 联系我们
               </a>
               <a
                 href="https://github.com/xerrors/Yuxi-Know"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="hover:underline"
               >
                 使用帮助
               </a>
@@ -280,6 +347,7 @@ const LoginView: React.FC = () => {
                 href="https://github.com/xerrors/Yuxi-Know/blob/main/LICENSE"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="hover:underline"
               >
                 隐私政策
               </a>

@@ -1,10 +1,16 @@
 import React from 'react'
-import { Button, Dropdown, Menu, Modal } from 'antd'
-import { EditOutlined, DeleteOutlined, MoreOutlined } from '@ant-design/icons'
-import { PanelLeftClose, MessageSquarePlus } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu'
+import { PanelLeftClose, MessageSquarePlus, MoreHorizontal, Edit, Trash2 } from 'lucide-react'
 import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
+import { confirm } from '@/utils/confirm'
 import './ChatSidebarComponent.less'
 
 dayjs.extend(relativeTime)
@@ -14,7 +20,6 @@ interface ChatSidebarComponentProps {
   currentChatId: string | null
   chatsList: any[]
   isSidebarOpen: boolean
-  singleMode: boolean
   agents: any
   selectedAgentId: string | null
   onCreateChat: () => void
@@ -30,7 +35,6 @@ const ChatSidebarComponent: React.FC<ChatSidebarComponentProps> = (props) => {
     currentChatId,
     chatsList,
     isSidebarOpen,
-    singleMode,
     agents,
     selectedAgentId,
     onCreateChat,
@@ -60,14 +64,21 @@ const ChatSidebarComponent: React.FC<ChatSidebarComponentProps> = (props) => {
     return Object.fromEntries(Object.entries(groups).filter(([, value]) => value.length > 0))
   }, [chatsList])
 
-  const handleRename = (chatId: string) => {
+  const handleRename = async (chatId: string) => {
     const chat = chatsList.find((c) => c.id === chatId)
     if (!chat) return
-    Modal.confirm({
+
+    const result = await confirm({
       title: '重命名对话',
-      content: <Input defaultValue={chat.title} />,
-      onOk: (values: any) => onRenameChat({ chatId, title: values.title })
+      content: `请输入新的对话标题: ${chat.title}`
     })
+
+    if (result) {
+      const newTitle = prompt('请输入新的对话标题:', chat.title)
+      if (newTitle && newTitle.trim()) {
+        onRenameChat({ chatId, title: newTitle.trim() })
+      }
+    }
   }
 
   return (
@@ -76,10 +87,13 @@ const ChatSidebarComponent: React.FC<ChatSidebarComponentProps> = (props) => {
         <div className="header-title" onClick={onOpenAgentModal}>
           {selectedAgentName || '选择智能体'}
         </div>
-        <Button type="text" icon={<PanelLeftClose />} onClick={onToggleSidebar} />
+        <Button variant="ghost" size="icon" onClick={onToggleSidebar}>
+          <PanelLeftClose className="h-4 w-4" />
+        </Button>
       </div>
       <div className="conversation-list-top">
-        <Button onClick={onCreateChat} icon={<MessageSquarePlus />}>
+        <Button onClick={onCreateChat}>
+          <MessageSquarePlus className="h-4 w-4 mr-2" />
           创建新对话
         </Button>
       </div>
@@ -94,21 +108,23 @@ const ChatSidebarComponent: React.FC<ChatSidebarComponentProps> = (props) => {
                 onClick={() => onSelectChat(chat.id)}
               >
                 <div className="conversation-title">{chat.title || '新的对话'}</div>
-                <Dropdown
-                  overlay={
-                    <Menu>
-                      <Menu.Item key="rename" onClick={() => handleRename(chat.id)}>
-                        <EditOutlined /> 重命名
-                      </Menu.Item>
-                      <Menu.Item key="delete" onClick={() => onDeleteChat(chat.id)}>
-                        <DeleteOutlined /> 删除
-                      </Menu.Item>
-                    </Menu>
-                  }
-                  trigger={['click']}
-                >
-                  <Button type="text" icon={<MoreOutlined />} />
-                </Dropdown>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <MoreHorizontal className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => handleRename(chat.id)}>
+                      <Edit className="h-4 w-4 mr-2" />
+                      重命名
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onDeleteChat(chat.id)}>
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      删除
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))}
           </div>

@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useEffect } from 'react'
-import { DeploymentUnitOutlined } from '@ant-design/icons'
+import { Network } from 'lucide-react'
 import GraphContainer from '../GraphContainer'
 import './KnowledgeGraphResult.less'
 
@@ -42,14 +42,14 @@ const KnowledgeGraphResult: React.FC<KnowledgeGraphResultProps> = ({ data }) => 
     <div className="knowledge-graph-result">
       <div className="kg-header">
         <h4>
-          <DeploymentUnitOutlined /> 知识图谱查询结果
+          <Network className="h-4 w-4 mr-2 inline" /> 知识图谱查询结果
         </h4>
         <div className="result-summary">
           找到 {graphData.nodes.length} 个节点, {graphData.edges.length} 个关系
         </div>
       </div>
       <div className="graph-visualization">
-        <GraphContainer graphData={graphData} ref={graphContainerRef} />
+        <GraphContainer initialData={graphData} ref={graphContainerRef} />
       </div>
     </div>
   )

@@ -1,9 +1,18 @@
 import React, { useState } from 'react'
-import { Button, Input, Select, Form, Spin, message } from 'antd'
-import { SendOutlined, SettingOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Send } from 'lucide-react'
 import { useDatabaseStore } from '@/stores/databaseStore'
 import { queryApi } from '@/apis/knowledge_api'
-import './QuerySection.less'
+import { message } from '@/utils/toast'
 
 interface QuerySectionProps {
   visible?: boolean
@@ -20,7 +29,7 @@ const QuerySection: React.FC<QuerySectionProps> = ({ visible = true, style, onTo
   const handleQuery = async () => {
     setLoading(true)
     try {
-      const data = await queryApi.queryKnowledgeBase(databaseId!, query, meta)
+      const data = await queryApi.queryKnowledgeBase(databaseId!.toString(), query, meta)
       setResult(data)
     } catch (error: any) {
       message.error(error.message || '查询失败')
@@ -33,38 +42,49 @@ const QuerySection: React.FC<QuerySectionProps> = ({ visible = true, style, onTo
     <div className={`query-section ${!visible ? 'collapsed' : ''}`} style={style}>
       <div className="section-header">
         <h3>查询测试</h3>
-        <Button type="text" size="small" onClick={onToggleVisible}>
+        <Button variant="ghost" size="sm" onClick={onToggleVisible}>
           {visible ? '收起' : '展开'}
         </Button>
       </div>
       <div className="query-content" style={{ display: visible ? 'block' : 'none' }}>
-        <Form layout="vertical">
+        <div className="space-y-4">
           {queryParams.map((param: any) => (
-            <Form.Item key={param.key} label={param.label}>
+            <div key={param.key} className="space-y-2">
+              <Label>{param.label}</Label>
               <Select
                 value={meta[param.key]}
-                onChange={(value) => setMeta({ ...meta, [param.key]: value })}
+                onValueChange={(value) => setMeta({ ...meta, [param.key]: value })}
               >
-                {param.options.map((option: any) => (
-                  <Select.Option key={option} value={option}>
-                    {option}
-                  </Select.Option>
-                ))}
+                <SelectTrigger>
+                  <SelectValue placeholder={`选择${param.label}`} />
+                </SelectTrigger>
+                <SelectContent>
+                  {param.options.map((option: any) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
               </Select>
-            </Form.Item>
+            </div>
           ))}
-        </Form>
-        <Input.TextArea
+        </div>
+        <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          rows={4}
           placeholder="输入查询内容"
+          className="min-h-[100px]"
         />
-        <Button type="primary" onClick={handleQuery} loading={loading} icon={<SendOutlined />}>
+        <Button onClick={handleQuery} disabled={loading} className="gap-2 mt-4">
+          <Send className="h-4 w-4" />
           查询
+          {loading && <span className="animate-spin">⏳</span>}
         </Button>
-        {loading && <Spin />}
-        {result && <pre>{JSON.stringify(result, null, 2)}</pre>}
+        {result && (
+          <pre className="bg-muted p-4 rounded-md overflow-auto">
+            {JSON.stringify(result, null, 2)}
+          </pre>
+        )}
       </div>
     </div>
   )

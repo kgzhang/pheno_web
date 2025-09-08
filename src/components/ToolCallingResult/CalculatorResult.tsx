@@ -1,5 +1,5 @@
 import React from 'react'
-import { NumberOutlined } from '@ant-design/icons'
+import { Hash } from 'lucide-react'
 import './CalculatorResult.less'
 
 interface CalculatorResultProps {
@@ -24,7 +24,7 @@ const CalculatorResult: React.FC<CalculatorResultProps> = ({ data }) => {
     <div className="calculator-result">
       <div className="calc-header">
         <h4>
-          <NumberOutlined /> 计算结果
+          <Hash className="h-4 w-4 mr-2 inline" /> 计算结果
         </h4>
       </div>
       <div className="calc-display">

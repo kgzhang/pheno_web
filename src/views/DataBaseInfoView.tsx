@@ -2,8 +2,9 @@ import React, { useEffect, useState, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { useDatabaseStore } from '@/stores/databaseStore'
 import { getKbTypeLabel } from '@/utils/kb_utils'
-import { Modal, Button } from 'antd'
-import { CompressOutlined } from '@ant-design/icons'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Minimize2 } from 'lucide-react'
 import KnowledgeGraphViewer from '@/components/KnowledgeGraphViewer'
 import DatabaseHeader from '@/components/DatabaseHeader'
 import FileTable from '@/components/FileTable'
@@ -33,7 +34,7 @@ const DataBaseInfoView: React.FC = () => {
     startAutoRefresh: state.startAutoRefresh,
     stopAutoRefresh: state.stopAutoRefresh,
     databaseId: state.databaseId,
-    setDatabaseId: (id: number | null) => (state.databaseId = id),
+    setDatabaseId: (id: number | null) => ({ databaseId: id }),
     isGraphMaximized: state.state.isGraphMaximized,
     toggleGraphMaximize: () => (state.state.isGraphMaximized = !state.state.isGraphMaximized),
     toggleRightPanel: () => (state.state.rightPanelVisible = !state.state.rightPanelVisible)
@@ -84,33 +85,32 @@ const DataBaseInfoView: React.FC = () => {
   return (
     <div className="database-info-container">
       <DatabaseHeader />
-      <Modal
-        open={isGraphMaximized}
-        footer={null}
-        closable={false}
-        width="100%"
-        wrapClassName="full-modal"
-      >
-        <div className="maximized-graph-header">
-          <h3>知识图谱 (最大化)</h3>
-          <Button type="text" onClick={toggleGraphMaximize}>
-            <CompressOutlined /> 退出最大化
-          </Button>
-        </div>
-        <div className="maximized-graph-content">
-          {database.kb_type !== 'lightrag' ? (
-            <div className="graph-disabled">
-              <h4>知识图谱不可用</h4>
-              <p>
-                当前知识库类型 "{getKbTypeLabel(database.kb_type || 'lightrag')}"
-                不支持知识图谱功能。
-              </p>
-            </div>
-          ) : (
-            <KnowledgeGraphViewer initialDatabaseId={databaseId} hideDbSelector={true} />
-          )}
-        </div>
-      </Modal>
+      <Dialog open={isGraphMaximized} onOpenChange={toggleGraphMaximize}>
+        <DialogContent className="full-modal max-w-none w-full h-full">
+          <div className="maximized-graph-header">
+            <h3>知识图谱 (最大化)</h3>
+            <Button variant="ghost" onClick={toggleGraphMaximize}>
+              <Minimize2 className="h-4 w-4 mr-2" /> 退出最大化
+            </Button>
+          </div>
+          <div className="maximized-graph-content">
+            {database.kb_type !== 'lightrag' ? (
+              <div className="graph-disabled">
+                <h4>知识图谱不可用</h4>
+                <p>
+                  当前知识库类型 "{getKbTypeLabel(database.kb_type || 'lightrag')}"
+                  不支持知识图谱功能。
+                </p>
+              </div>
+            ) : (
+              <KnowledgeGraphViewer
+                initialDatabaseId={databaseId?.toString()}
+                hideDbSelector={true}
+              />
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       <FileDetailModal />
       <FileUploadModal visible={addFilesModalVisible} onVisibleChange={setAddFilesModalVisible} />
       <div className="unified-layout">

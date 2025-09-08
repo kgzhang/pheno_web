@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Button, Select, message, notification } from 'antd'
+import { Button } from '@/components/ui/button'
 import {
-  ReloadOutlined,
-  SettingOutlined,
-  CodeOutlined,
-  UserOutlined,
-  GlobalOutlined
-} from '@ant-design/icons'
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { toast } from '@/utils/toast'
+import { RefreshCw, Settings, Code, User } from 'lucide-react'
 import HeaderComponent from '@/components/HeaderComponent'
 import ModelProvidersComponent from '@/components/ModelProvidersComponent'
 import UserManagementComponent from '@/components/UserManagementComponent'
@@ -32,85 +34,67 @@ const SettingView: React.FC = () => {
   const handleChange = (key: string, value: any) => {
     if (['enable_reranker', 'embed_model', 'reranker', 'model_local_paths'].includes(key)) {
       setIsNeedRestart(true)
-      notification.info({
-        message: '需要重新加载模型',
-        description: '请点击右下角按钮重新加载模型',
-        placement: 'topLeft',
-        duration: 0,
-        btn: (
-          <Button type="primary" onClick={sendRestart}>
-            立即重新加载
-          </Button>
-        )
-      })
+      toast.info('需要重新加载模型，请点击右下角按钮重新加载模型')
     }
     setConfigValue(key, value)
   }
 
   const sendRestart = async () => {
-    message.loading({ content: '重新加载模型中', key: 'restart', duration: 0 })
+    toast.loading('重新加载模型中')
     try {
       await configApi.restartSystem()
-      message.success({ content: '重新加载完成!', key: 'restart', duration: 2 })
+      toast.success('重新加载完成!')
       setTimeout(() => window.location.reload(), 200)
     } catch (error: any) {
-      message.error({ content: `重启失败: ${error.message}`, key: 'restart', duration: 2 })
+      toast.error(`重启失败: ${error.message}`)
     }
   }
 
   return (
     <div className="setting-container layout-container">
       <HeaderComponent title="设置">
-        <template slot="actions">
-          <Button
-            type={isNeedRestart ? 'primary' : 'default'}
-            onClick={sendRestart}
-            icon={<ReloadOutlined />}
-          >
-            {isNeedRestart ? '需要刷新' : '重新加载'}
-          </Button>
-        </template>
+        <Button variant={isNeedRestart ? 'default' : 'outline'} onClick={sendRestart}>
+          <RefreshCw className="h-4 w-4 mr-2" />
+          {isNeedRestart ? '需要刷新' : '重新加载'}
+        </Button>
       </HeaderComponent>
       <div className="setting-container-body">
         {windowWidth > 520 && (
           <div className="sider">
-            {isSuperAdmin && (
+            {isSuperAdmin() && (
               <Button
-                type="text"
+                variant="ghost"
                 className={section === 'base' ? 'activesec' : ''}
                 onClick={() => setSection('base')}
-                icon={<SettingOutlined />}
               >
-                {' '}
-                基本设置{' '}
+                <Settings className="h-4 w-4 mr-2" />
+                基本设置
               </Button>
             )}
-            {isSuperAdmin && (
+            {isSuperAdmin() && (
               <Button
-                type="text"
+                variant="ghost"
                 className={section === 'model' ? 'activesec' : ''}
                 onClick={() => setSection('model')}
-                icon={<CodeOutlined />}
               >
-                {' '}
-                模型配置{' '}
+                <Code className="h-4 w-4 mr-2" />
+                模型配置
               </Button>
             )}
-            {isAdmin && (
+            {isAdmin() && (
               <Button
-                type="text"
+                variant="ghost"
                 className={section === 'user' ? 'activesec' : ''}
                 onClick={() => setSection('user')}
-                icon={<UserOutlined />}
               >
-                {' '}
-                用户管理{' '}
+                <User className="h-4 w-4 mr-2" />
+                用户管理
               </Button>
             )}
           </div>
         )}
         <div className="setting">
-          {(windowWidth <= 520 || section === 'base') && isSuperAdmin && (
+          {(windowWidth <= 520 || section === 'base') && isSuperAdmin() && (
             <>
               <h3>检索配置</h3>
               <div className="section">
@@ -127,35 +111,43 @@ const SettingView: React.FC = () => {
                 <div className="card card-select">
                   <span className="label">{config?._config_items?.embed_model.des}</span>
                   <Select
-                    style={{ width: 300 }}
                     value={config?.embed_model}
-                    onChange={(value) => handleChange('embed_model', value)}
+                    onValueChange={(value) => handleChange('embed_model', value)}
                   >
-                    {config?._config_items?.embed_model.choices.map((name: string) => (
-                      <Select.Option key={name} value={name}>
-                        {name}
-                      </Select.Option>
-                    ))}
+                    <SelectTrigger className="w-[300px]">
+                      <SelectValue placeholder="选择嵌入模型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {config?._config_items?.embed_model.choices.map((name: string) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
                 <div className="card card-select">
                   <span className="label">{config?._config_items?.reranker.des}</span>
                   <Select
-                    style={{ width: 300 }}
                     value={config?.reranker}
-                    onChange={(value) => handleChange('reranker', value)}
+                    onValueChange={(value) => handleChange('reranker', value)}
                   >
-                    {config?._config_items?.reranker.choices.map((name: string) => (
-                      <Select.Option key={name} value={name}>
-                        {name}
-                      </Select.Option>
-                    ))}
+                    <SelectTrigger className="w-[300px]">
+                      <SelectValue placeholder="选择重排序模型" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {config?._config_items?.reranker.choices.map((name: string) => (
+                        <SelectItem key={name} value={name}>
+                          {name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
                   </Select>
                 </div>
               </div>
             </>
           )}
-          {(windowWidth <= 520 || section === 'model') && isSuperAdmin && (
+          {(windowWidth <= 520 || section === 'model') && isSuperAdmin() && (
             <>
               <h3>模型配置</h3>
               <p>
@@ -164,7 +156,7 @@ const SettingView: React.FC = () => {
               <ModelProvidersComponent />
             </>
           )}
-          {(windowWidth <= 520 || section === 'user') && isAdmin && <UserManagementComponent />}
+          {(windowWidth <= 520 || section === 'user') && isAdmin() && <UserManagementComponent />}
         </div>
       </div>
     </div>

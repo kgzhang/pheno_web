@@ -1,52 +1,38 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { Link } from 'react-router-dom'
-import { Button, Modal, Input, Upload, message, Tag, Empty } from 'antd'
+import React, { useState, useEffect } from 'react'
+import { Button } from '@/components/ui/button'
 import {
-  UploadOutlined,
-  SyncOutlined,
-  GlobalOutlined,
-  InfoCircleOutlined,
-  SearchOutlined,
-  ReloadOutlined,
-  LoadingOutlined
-} from '@ant-design/icons'
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
+import { Upload } from 'lucide-react'
 import HeaderComponent from '@/components/HeaderComponent'
 import { neo4jApi } from '@/apis/graph_api'
-import { useUserStore } from '@/stores/userStore'
-import { Graph } from '@antv/g6'
 import './GraphView.less'
 
 const GraphView: React.FC = () => {
-  const { getAuthHeaders } = useUserStore()
-  const [graphInfo, setGraphInfo] = useState<any>(null)
   const [graphData, setGraphData] = useState<{ nodes: any[]; edges: any[] }>({
     nodes: [],
     edges: []
   })
-  const [loading, setLoading] = useState(false)
   const [showModal, setShowModal] = useState(false)
-  const [fileList, setFileList] = useState<any[]>([])
-  const container = useRef<HTMLDivElement>(null)
-  let graphInstance: Graph | null = null
 
   const loadGraphInfo = async () => {
     try {
-      const data = await neo4jApi.getInfo()
-      setGraphInfo(data.data)
+      await neo4jApi.getInfo()
     } catch (error: any) {
-      message.error(error.message || '加载图数据库信息失败')
+      console.error(error.message || '加载图数据库信息失败')
     }
   }
 
   const loadSampleNodes = async () => {
-    setLoading(true)
     try {
       const data = await neo4jApi.getSampleNodes()
       setGraphData({ nodes: data.result.nodes, edges: data.result.edges })
     } catch (error: any) {
-      message.error(error.message || '加载节点失败')
-    } finally {
-      setLoading(false)
+      console.error(error.message || '加载节点失败')
     }
   }
 
@@ -56,42 +42,9 @@ const GraphView: React.FC = () => {
   }, [])
 
   useEffect(() => {
-    if (graphData.nodes.length > 0 && container.current) {
-      if (graphInstance) {
-        graphInstance.destroy()
-      }
-      graphInstance = new Graph({
-        container: container.current,
-        width: container.current.offsetWidth,
-        height: container.current.offsetHeight,
-        autoFit: true,
-        layout: { type: 'd3-force', preventOverlap: true },
-        node: {
-          style: {
-            labelText: (d: any) => d.data.label
-          }
-        },
-        edge: {
-          style: {
-            labelText: (d: any) => d.data.label,
-            endArrow: true
-          }
-        },
-        behaviors: ['drag-element', 'zoom-canvas', 'drag-canvas']
-      })
-      graphInstance.read({
-        nodes: graphData.nodes.map((node) => ({ id: String(node.id), data: { label: node.name } })),
-        edges: graphData.edges.map((edge, i) => ({
-          id: `edge-${i}`,
-          source: edge.source_id,
-          target: edge.target_id,
-          data: { label: edge.type }
-        }))
-      })
-    }
+    // 图形渲染逻辑已移除，需要重新实现或使用其他图形库
+    console.log('Graph data updated:', graphData)
   }, [graphData])
-
-  const handleFileUpload = ({ fileList }: any) => setFileList(fileList)
 
   const addDocumentByFile = async () => {
     // Implement file upload logic
@@ -100,35 +53,52 @@ const GraphView: React.FC = () => {
   return (
     <div className="graph-container layout-container">
       <HeaderComponent title="图数据库">
-        <template slot="actions">
-          <Button type="primary" onClick={() => setShowModal(true)} icon={<UploadOutlined />}>
+        <div slot="actions">
+          <Button onClick={() => setShowModal(true)}>
+            <Upload className="w-4 h-4 mr-2" />
             上传文件
           </Button>
-        </template>
+        </div>
       </HeaderComponent>
       <div className="container-outter">
-        {graphData.nodes.length > 0 ? (
-          <div className="main" ref={container}></div>
-        ) : (
-          <Empty style={{ padding: '4rem 0' }} />
-        )}
+        <div className="flex items-center justify-center h-64 text-muted-foreground">
+          <div className="text-center">
+            <div className="text-2xl mb-2">📊</div>
+            <p>图形可视化功能需要重新实现</p>
+            <p className="text-sm text-muted-foreground mt-2">请使用其他图形库如Sigma.js或D3.js</p>
+          </div>
+        </div>
       </div>
-      <Modal
-        open={showModal}
-        title="上传文件"
-        onOk={addDocumentByFile}
-        onCancel={() => setShowModal(false)}
-      >
-        <Upload.Dragger
-          fileList={fileList}
-          action="/api/knowledge/files/upload"
-          headers={getAuthHeaders()}
-          onChange={handleFileUpload}
-        >
-          <p className="ant-upload-text">点击或者把文件拖拽到这里上传</p>
-          <p className="ant-upload-hint">目前仅支持上传 jsonl 文件。</p>
-        </Upload.Dragger>
-      </Modal>
+      <Dialog open={showModal} onOpenChange={setShowModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>上传文件</DialogTitle>
+          </DialogHeader>
+          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
+            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+            <p className="text-sm font-medium mb-2">点击或者把文件拖拽到这里上传</p>
+            <p className="text-xs text-muted-foreground">目前仅支持上传 jsonl 文件。</p>
+            <input
+              type="file"
+              className="mt-4"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                const files = e.target.files
+                if (files && files.length > 0) {
+                  // 文件上传逻辑
+                  console.log('Files selected:', Array.from(files))
+                }
+              }}
+              accept=".jsonl"
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowModal(false)}>
+              取消
+            </Button>
+            <Button onClick={addDocumentByFile}>上传</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

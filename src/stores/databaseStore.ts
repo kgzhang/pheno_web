@@ -1,6 +1,7 @@
 import { create } from 'zustand'
-import { message, Modal } from 'antd'
 import { databaseApi, documentApi, queryApi } from '@/apis/knowledge_api'
+import { message } from '@/utils/toast'
+import { confirm } from '@/utils/confirm'
 
 interface DatabaseState {
   database: Record<string, any>
@@ -41,9 +42,11 @@ interface DatabaseState {
   stopAutoRefresh: () => void
   toggleAutoRefresh: () => void
   selectAllFailedFiles: () => void
+  setMeta: (meta: Record<string, any>) => void
+  setSelectedRowKeys: (keys: any[]) => void
 }
 
-let refreshInterval: NodeJS.Timeout | null = null
+let refreshInterval: any = null
 
 export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   database: {},
@@ -78,7 +81,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
 
     set((state) => ({ state: { ...state.state, lock: true, databaseLoading: true } }))
     try {
-      const data = await databaseApi.getDatabaseInfo(db_id)
+      const data = await databaseApi.getDatabaseInfo(db_id.toString())
       set({ database: data })
       await get().loadQueryParams(db_id)
     } catch (error: any) {
@@ -92,7 +95,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   updateDatabaseInfo: async (formData) => {
     try {
       set((state) => ({ state: { ...state.state, lock: true } }))
-      await databaseApi.updateDatabase(get().databaseId!, formData)
+      await databaseApi.updateDatabase(get().databaseId!.toString(), formData)
       message.success('知识库信息更新成功')
       await get().getDatabaseInfo()
     } catch (error: any) {
@@ -104,15 +107,13 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   },
 
   deleteDatabase: () => {
-    Modal.confirm({
+    confirm({
       title: '删除数据库',
       content: '确定要删除该数据库吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: async () => {
+      onConfirm: async () => {
         set((state) => ({ state: { ...state.state, lock: true } }))
         try {
-          const data = await databaseApi.deleteDatabase(get().databaseId!)
+          const data = await databaseApi.deleteDatabase(get().databaseId!.toString())
           message.success(data.message || '删除成功')
           // TODO: router.push('/database');
         } catch (error: any) {
@@ -128,7 +129,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   deleteFile: async (fileId) => {
     set((state) => ({ state: { ...state.state, lock: true } }))
     try {
-      await documentApi.deleteDocument(get().databaseId!, fileId)
+      await documentApi.deleteDocument(get().databaseId!.toString(), fileId)
       await get().getDatabaseInfo()
     } catch (error: any) {
       console.error(error)
@@ -140,19 +141,17 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   },
 
   handleDeleteFile: (fileId) => {
-    Modal.confirm({
+    confirm({
       title: '删除文件',
       content: '确定要删除该文件吗？',
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => get().deleteFile(fileId)
+      onConfirm: () => get().deleteFile(fileId)
     })
   },
 
   handleBatchDelete: () => {
     const files = get().database.files || {}
     const validFileIds = get().selectedRowKeys.filter((fileId) => {
-      const file = files[fileId]
+      const file = files[fileId] as Record<string, any>
       return file && !(file.status === 'processing' || file.status === 'waiting')
     })
 
@@ -161,16 +160,13 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
       return
     }
 
-    Modal.confirm({
+    confirm({
       title: '批量删除文件',
       content: `确定要删除选中的 ${validFileIds.length} 个文件吗？`,
-      okText: '确认',
-      cancelText: '取消',
-      onOk: async () => {
+      onConfirm: async () => {
         set((state) => ({ state: { ...state.state, batchDeleting: true } }))
         let successCount = 0
         let failureCount = 0
-        const hide = message.loading(`正在删除文件 0/${validFileIds.length}`, 0)
 
         try {
           for (let i = 0; i < validFileIds.length; i++) {
@@ -183,7 +179,6 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
               failureCount++
             }
           }
-          hide()
           if (successCount > 0 && failureCount === 0) {
             message.success(`成功删除 ${successCount} 个文件`)
           } else if (successCount > 0 && failureCount > 0) {
@@ -194,7 +189,6 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
           set({ selectedRowKeys: [] })
           await get().getDatabaseInfo()
         } catch (error) {
-          hide()
           console.error('批量删除出错:', error)
           message.error('批量删除过程中发生错误')
         } finally {
@@ -212,7 +206,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
 
     set((state) => ({ state: { ...state.state, chunkLoading: true } }))
     try {
-      const data = await documentApi.addDocuments(get().databaseId!, items, {
+      const data = await documentApi.addDocuments(get().databaseId!.toString(), items, {
         ...params,
         content_type: contentType
       })
@@ -245,7 +239,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
     }))
 
     try {
-      const data = await documentApi.getDocumentInfo(get().databaseId!, record.file_id)
+      const data = await documentApi.getDocumentInfo(get().databaseId!.toString(), record.file_id)
       if (data.status === 'failed') {
         message.error(data.message)
         set((state) => ({ state: { ...state.state, fileDetailModalVisible: false } }))
@@ -267,7 +261,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
 
     set((state) => ({ state: { ...state.state, queryParamsLoading: true } }))
     try {
-      const response = await queryApi.getKnowledgeBaseQueryParams(db_id)
+      const response = await queryApi.getKnowledgeBaseQueryParams(db_id.toString())
       const queryParams = response.params?.options || []
       set({ queryParams })
 
@@ -317,7 +311,7 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
   },
 
   selectAllFailedFiles: () => {
-    const files = Object.values(get().database.files || {})
+    const files = Object.values(get().database.files || {}) as Record<string, any>[]
     const failedFiles = files.filter((file) => file.status === 'failed').map((file) => file.file_id)
 
     const newSelectedKeys = [...new Set([...get().selectedRowKeys, ...failedFiles])]
@@ -328,5 +322,13 @@ export const useDatabaseStore = create<DatabaseState>((set, get) => ({
     } else {
       message.info('当前没有失败的文件')
     }
+  },
+
+  setMeta: (newMeta) => {
+    set({ meta: newMeta })
+  },
+
+  setSelectedRowKeys: (keys) => {
+    set({ selectedRowKeys: keys })
   }
 }))

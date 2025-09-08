@@ -1,7 +1,5 @@
 import React from 'react'
-import { Spin } from 'antd'
-import { LoadingOutlined } from '@ant-design/icons'
-import './HeaderComponent.less'
+import { Loader2 } from 'lucide-react'
 
 interface HeaderComponentProps {
   title: string
@@ -10,6 +8,7 @@ interface HeaderComponentProps {
   children?: React.ReactNode
   actions?: React.ReactNode
   left?: React.ReactNode
+  className?: string
 }
 
 const HeaderComponent: React.FC<HeaderComponentProps> = ({
@@ -18,22 +17,25 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({
   loading,
   children,
   actions,
-  left
+  left,
+  className = ''
 }) => {
   return (
-    <div className="header-container">
-      <div className="header-content">
-        {left && <div className="header-actions">{left}</div>}
-        <div className="header-title">
-          <div className="header-title-block">
-            <h1>{title}</h1>
+    <div
+      className={`bg-background/80 backdrop-blur-sm px-6 py-3 border-b border-border sticky top-0 z-50 ${className}`}
+    >
+      <div className="flex justify-between items-center gap-3">
+        {left && <div className="flex gap-2">{left}</div>}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-lg font-semibold text-foreground m-0">{title}</h1>
             {children}
           </div>
-          {description && <p>{description}</p>}
+          {description && <p className="text-sm text-muted-foreground mt-2 mb-0">{description}</p>}
         </div>
         {actions && (
-          <div className="header-actions">
-            {loading && <Spin indicator={<LoadingOutlined style={{ fontSize: 24 }} spin />} />}
+          <div className="flex gap-2 items-center">
+            {loading && <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />}
             {actions}
           </div>
         )}

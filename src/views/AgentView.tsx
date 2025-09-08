@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { Button, Modal, message } from 'antd'
-import { SettingOutlined, LinkOutlined, StarOutlined, StarFilled } from '@ant-design/icons'
-import { Bot } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { toast } from '@/utils/toast'
+import { Settings, Link, Star, StarOff, Bot } from 'lucide-react'
 import AgentChatComponent from '@/components/AgentChatComponent'
 import AgentConfigSidebar from '@/components/AgentConfigSidebar'
 import { useUserStore } from '@/stores/userStore'
@@ -11,7 +11,6 @@ import { useInfoStore } from '@/stores/infoStore'
 import './AgentView.less'
 
 const AgentView: React.FC = () => {
-  const navigate = useNavigate()
   const { isAdmin } = useUserStore()
   const { agents, selectedAgentId, defaultAgentId, selectedAgent, setDefaultAgent, selectAgent } =
     useAgentStore()
@@ -24,9 +23,9 @@ const AgentView: React.FC = () => {
     if (!agentId || !isAdmin()) return
     try {
       await setDefaultAgent(agentId)
-      message.success('已将当前智能体设为默认')
+      toast.success('已将当前智能体设为默认')
     } catch (error: any) {
-      message.error(error.message || '设置默认智能体时发生错误')
+      toast.error(error.message || '设置默认智能体时发生错误')
     }
   }
 
@@ -49,7 +48,11 @@ const AgentView: React.FC = () => {
             <span className="brandname">{branding()?.title}</span>
           </div>
           <div className="header-item">
-            <Button className="header-button" onClick={() => setAgentModalOpen(true)}>
+            <Button
+              variant="outline"
+              className="header-button"
+              onClick={() => setAgentModalOpen(true)}
+            >
               <Bot size={18} strokeWidth={1.75} />
               选择：{selectedAgent()?.name || '选择智能体'}
             </Button>
@@ -58,17 +61,18 @@ const AgentView: React.FC = () => {
         <div className="header-right">
           <div className="header-item">
             <Button
+              variant="outline"
               className="header-button"
               onClick={() => setIsConfigSidebarOpen(!isConfigSidebarOpen)}
-              icon={<SettingOutlined />}
             >
-              {' '}
-              配置{' '}
+              <Settings className="h-4 w-4 mr-2" />
+              配置
             </Button>
           </div>
           {selectedAgentId && (
             <div className="header-item">
-              <Button className="header-button" onClick={goToAgentPage} icon={<LinkOutlined />}>
+              <Button variant="outline" className="header-button" onClick={goToAgentPage}>
+                <Link className="h-4 w-4 mr-2" />
                 独立页面
               </Button>
             </div>
@@ -76,44 +80,40 @@ const AgentView: React.FC = () => {
         </div>
       </div>
       <div className="agent-view-body">
-        <Modal
-          open={agentModalOpen}
-          title="选择智能体"
-          width={800}
-          footer={null}
-          onCancel={() => setAgentModalOpen(false)}
-          className="agent-modal"
-        >
-          <div className="agent-modal-content">
-            <div className="agents-grid">
-              {Object.entries(agents).map(([id, agent]) => (
-                <div
-                  key={id}
-                  className={`agent-card ${id === selectedAgentId ? 'selected' : ''}`}
-                  onClick={() => selectAgentFromModal(id)}
-                >
-                  <div className="agent-card-header">
-                    <div className="agent-card-title">
-                      <span className="agent-card-name">{agent.name}</span>
-                      {id === defaultAgentId ? (
-                        <StarFilled className="default-icon" />
-                      ) : (
-                        <StarOutlined
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setAsDefaultAgent(id)
-                          }}
-                          className="default-icon"
-                        />
-                      )}
+        <Dialog open={agentModalOpen} onOpenChange={setAgentModalOpen}>
+          <DialogContent className="agent-modal max-w-4xl">
+            <h3 className="text-lg font-semibold mb-4">选择智能体</h3>
+            <div className="agent-modal-content">
+              <div className="agents-grid">
+                {Object.entries(agents).map(([id, agent]) => (
+                  <div
+                    key={id}
+                    className={`agent-card ${id === selectedAgentId ? 'selected' : ''}`}
+                    onClick={() => selectAgentFromModal(id)}
+                  >
+                    <div className="agent-card-header">
+                      <div className="agent-card-title">
+                        <span className="agent-card-name">{agent.name}</span>
+                        {id === defaultAgentId ? (
+                          <Star className="default-icon text-yellow-500 fill-current" />
+                        ) : (
+                          <StarOff
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setAsDefaultAgent(id)
+                            }}
+                            className="default-icon text-gray-400 hover:text-yellow-500 cursor-pointer"
+                          />
+                        )}
+                      </div>
                     </div>
+                    <div className="agent-card-description">{agent.description}</div>
                   </div>
-                  <div className="agent-card-description">{agent.description}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        </Modal>
+          </DialogContent>
+        </Dialog>
         <div className="content">
           <AgentChatComponent
             singleMode={false}

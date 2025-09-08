@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Button, Input, Select, Checkbox, Tooltip, message } from 'antd'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { message } from '@/utils/toast'
 import {
-  ReloadOutlined,
-  ClearOutlined,
-  SettingOutlined,
-  UserOutlined,
-  DatabaseOutlined,
-  RobotOutlined,
-  FullscreenOutlined,
-  FullscreenExitOutlined,
-  SyncOutlined,
-  CheckCircleOutlined,
-  PlusCircleOutlined
-} from '@ant-design/icons'
+  RefreshCw,
+  Trash2,
+  Settings,
+  User,
+  Database,
+  Bot,
+  Maximize2,
+  Minimize2,
+  RotateCw
+} from 'lucide-react'
 import dayjs from 'dayjs'
 import { useConfigStore } from '@/stores/configStore'
 import { useUserStore } from '@/stores/userStore'
@@ -56,9 +58,9 @@ const DebugComponent: React.FC = () => {
 
   useEffect(() => {
     fetchLogs()
-    let interval: NodeJS.Timeout
+    let interval: number
     if (autoRefresh) {
-      interval = setInterval(fetchLogs, 5000)
+      interval = window.setInterval(fetchLogs, 5000)
     }
     return () => clearInterval(interval)
   }, [autoRefresh])
@@ -84,64 +86,97 @@ const DebugComponent: React.FC = () => {
     .filter((log) => log.raw.toLowerCase().includes(searchText.toLowerCase()))
 
   return (
-    <div className={`log-viewer ${isFullscreen ? 'fullscreen' : ''}`} ref={logViewer}>
-      <div className="control-panel">
-        <Button onClick={fetchLogs} loading={fetching} icon={<ReloadOutlined />} />
-        <Button onClick={() => setRawLogs([])} icon={<ClearOutlined />} />
-        <Button onClick={() => console.log(config)} icon={<SettingOutlined />}>
-          系统配置
-        </Button>
-        <Button onClick={() => console.log(userStore)} icon={<UserOutlined />}>
-          用户信息
-        </Button>
-        <Button onClick={() => console.log(databaseStore)} icon={<DatabaseOutlined />}>
-          知识库信息
-        </Button>
-        <Button onClick={() => console.log(agentStore)} icon={<RobotOutlined />}>
-          智能体配置
-        </Button>
-        <Button
-          onClick={() => setIsFullscreen(!isFullscreen)}
-          icon={isFullscreen ? <FullscreenExitOutlined /> : <FullscreenOutlined />}
-        >
-          {isFullscreen ? '退出全屏' : '全屏'}
-        </Button>
-        <Tooltip title={autoRefresh ? '点击停止自动刷新' : '点击开启自动刷新'}>
-          <Button
-            type={autoRefresh ? 'primary' : 'default'}
-            onClick={() => setAutoRefresh(!autoRefresh)}
-            icon={<SyncOutlined spin={autoRefresh} />}
-          >
-            自动刷新
+    <TooltipProvider>
+      <div className={`log-viewer ${isFullscreen ? 'fullscreen' : ''}`} ref={logViewer}>
+        <div className="control-panel">
+          <Button onClick={fetchLogs} loading={fetching} variant="outline" size="icon">
+            <RefreshCw className="h-4 w-4" />
           </Button>
-        </Tooltip>
-      </div>
-      <div className="filter-group">
-        <Input.Search
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          placeholder="搜索日志..."
-          style={{ width: 200 }}
-        />
-        <Checkbox.Group
-          options={logLevels}
-          value={selectedLevels}
-          onChange={(checkedValues) => setSelectedLevels(checkedValues as string[])}
-        />
-      </div>
-      <div className="log-container">
-        {processedLogs.map((log, index) => (
-          <div key={index} className={`log-line level-${log.level.toLowerCase()}`}>
-            <span className="timestamp">
-              {dayjs(log.timestamp.replace(',', '.')).format('HH:mm:ss.SSS')}
-            </span>
-            <span className="level">{log.level}</span>
-            <span className="module">{log.module}</span>
-            <span className="message">{log.message}</span>
+          <Button onClick={() => setRawLogs([])} variant="outline" size="icon">
+            <Trash2 className="h-4 w-4" />
+          </Button>
+          <Button onClick={() => console.log(config)} variant="outline">
+            <Settings className="h-4 w-4 mr-2" />
+            系统配置
+          </Button>
+          <Button onClick={() => console.log(userStore)} variant="outline">
+            <User className="h-4 w-4 mr-2" />
+            用户信息
+          </Button>
+          <Button onClick={() => console.log(databaseStore)} variant="outline">
+            <Database className="h-4 w-4 mr-2" />
+            知识库信息
+          </Button>
+          <Button onClick={() => console.log(agentStore)} variant="outline">
+            <Bot className="h-4 w-4 mr-2" />
+            智能体配置
+          </Button>
+          <Button onClick={() => setIsFullscreen(!isFullscreen)} variant="outline">
+            {isFullscreen ? (
+              <Minimize2 className="h-4 w-4 mr-2" />
+            ) : (
+              <Maximize2 className="h-4 w-4 mr-2" />
+            )}
+            {isFullscreen ? '退出全屏' : '全屏'}
+          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant={autoRefresh ? 'default' : 'outline'}
+                onClick={() => setAutoRefresh(!autoRefresh)}
+              >
+                <RotateCw className={`h-4 w-4 mr-2 ${autoRefresh ? 'animate-spin' : ''}`} />
+                自动刷新
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{autoRefresh ? '点击停止自动刷新' : '点击开启自动刷新'}</TooltipContent>
+          </Tooltip>
+        </div>
+        <div className="filter-group">
+          <Input
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            placeholder="搜索日志..."
+            className="w-48"
+          />
+          <div className="flex items-center gap-2">
+            {logLevels.map((level) => (
+              <div key={level.value} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`level-${level.value}`}
+                  checked={selectedLevels.includes(level.value)}
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedLevels([...selectedLevels, level.value])
+                    } else {
+                      setSelectedLevels(selectedLevels.filter((l) => l !== level.value))
+                    }
+                  }}
+                />
+                <label
+                  htmlFor={`level-${level.value}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  {level.label}
+                </label>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+        <div className="log-container">
+          {processedLogs.map((log, index) => (
+            <div key={index} className={`log-line level-${log.level.toLowerCase()}`}>
+              <span className="timestamp">
+                {dayjs(log.timestamp.replace(',', '.')).format('HH:mm:ss.SSS')}
+              </span>
+              <span className="level">{log.level}</span>
+              <span className="module">{log.module}</span>
+              <span className="message">{log.message}</span>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </TooltipProvider>
   )
 }
 

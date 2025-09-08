@@ -1,41 +1,38 @@
-import {
-  FileTextFilled,
-  FileMarkdownFilled,
-  FilePdfFilled,
-  FileWordFilled,
-  FileExcelFilled,
-  FileImageFilled,
-  FileUnknownFilled
-} from '@ant-design/icons'
-import { FC } from 'react'
+import { FileText, FileCode, FileImage, File, FileType, FileSpreadsheet } from 'lucide-react'
+import type { FC } from 'react'
 
-export const getFileIcon = (filename: string): FC => {
-  if (!filename) return FileUnknownFilled
+interface IconProps {
+  className?: string
+  style?: React.CSSProperties
+}
+
+export const getFileIcon = (filename: string): FC<IconProps> => {
+  if (!filename) return File
 
   const extension = filename.toLowerCase().split('.').pop() || ''
 
-  const iconMap: Record<string, FC> = {
-    txt: FileTextFilled,
-    text: FileTextFilled,
-    log: FileTextFilled,
-    md: FileMarkdownFilled,
-    markdown: FileMarkdownFilled,
-    pdf: FilePdfFilled,
-    doc: FileWordFilled,
-    docx: FileWordFilled,
-    xls: FileExcelFilled,
-    xlsx: FileExcelFilled,
-    csv: FileExcelFilled,
-    jpg: FileImageFilled,
-    jpeg: FileImageFilled,
-    png: FileImageFilled,
-    gif: FileImageFilled,
-    bmp: FileImageFilled,
-    svg: FileImageFilled,
-    webp: FileImageFilled
+  const iconMap: Record<string, FC<IconProps>> = {
+    txt: FileText,
+    text: FileText,
+    log: FileText,
+    md: FileCode,
+    markdown: FileCode,
+    pdf: File,
+    doc: FileType,
+    docx: FileType,
+    xls: FileSpreadsheet,
+    xlsx: FileSpreadsheet,
+    csv: FileSpreadsheet,
+    jpg: FileImage,
+    jpeg: FileImage,
+    png: FileImage,
+    gif: FileImage,
+    bmp: FileImage,
+    svg: FileImage,
+    webp: FileImage
   }
 
-  return iconMap[extension] || FileUnknownFilled
+  return iconMap[extension] || File
 }
 
 export const getFileIconColor = (filename: string): string => {

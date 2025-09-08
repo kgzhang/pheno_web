@@ -7,7 +7,7 @@ interface ScrollControllerOptions {
 export class ScrollController {
   private containerSelector: string
   private options: Required<ScrollControllerOptions>
-  private scrollTimer: NodeJS.Timeout | null = null
+  private scrollTimer: ReturnType<typeof setTimeout> | null = null
   private isUserScrolling = false
   private shouldAutoScroll = true
   private isProgrammaticScroll = false

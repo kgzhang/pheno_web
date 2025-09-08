@@ -1,5 +1,5 @@
-import { message } from 'antd'
 import { useUserStore, checkAdminPermission, checkSuperAdminPermission } from '@/stores/userStore'
+import { message } from '@/utils/toast'
 
 export async function apiRequest(
   url: string,

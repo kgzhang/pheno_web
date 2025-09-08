@@ -1,5 +1,5 @@
 import React from 'react'
-import { GlobalOutlined } from '@ant-design/icons'
+import { Globe } from 'lucide-react'
 import './WebSearchResult.less'
 
 interface WebSearchResultProps {
@@ -30,7 +30,7 @@ const WebSearchResult: React.FC<WebSearchResultProps> = ({ data }) => {
     <div className="web-search-result">
       <div className="search-header">
         <h4>
-          <GlobalOutlined /> 网页搜索结果
+          <Globe className="h-4 w-4 mr-2 inline" /> 网页搜索结果
         </h4>
         <div className="search-meta">
           <span className="query-text">查询: {data.query}</span>

@@ -1,6 +1,7 @@
 import React from 'react'
-import { Button, Tooltip } from 'antd'
-import { CopyOutlined, RedoOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
+import { Copy, RotateCcw } from 'lucide-react'
 import { modelIcons } from '@/utils/modelIcon'
 import './RefsComponent.less'
 
@@ -9,15 +10,13 @@ interface RefsComponentProps {
   showRefs?: ('model' | 'copy' | 'retry')[]
   isLatestMessage?: boolean
   onRetry?: () => void
-  onOpenRefs?: (refs: any) => void
 }
 
 const RefsComponent: React.FC<RefsComponentProps> = ({
   message,
   showRefs = [],
   isLatestMessage = false,
-  onRetry,
-  onOpenRefs
+  onRetry
 }) => {
   const modelName = message.additional_kwargs?.model_name || 'default'
   const provider = modelName.split('/')[0]
@@ -39,13 +38,23 @@ const RefsComponent: React.FC<RefsComponentProps> = ({
         </div>
       )}
       {showRefs.includes('copy') && (
-        <Tooltip title="复制">
-          <Button type="text" icon={<CopyOutlined />} onClick={copyToClipboard} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={copyToClipboard}>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>复制</TooltipContent>
         </Tooltip>
       )}
       {showRefs.includes('retry') && isLatestMessage && (
-        <Tooltip title="重试">
-          <Button type="text" icon={<RedoOutlined />} onClick={onRetry} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button variant="ghost" size="icon" onClick={onRetry}>
+              <RotateCcw className="h-4 w-4" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>重试</TooltipContent>
         </Tooltip>
       )}
     </div>

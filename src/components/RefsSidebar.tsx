@@ -1,6 +1,6 @@
 import React from 'react'
-import { Button } from 'antd'
-import { BookOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import { Book } from 'lucide-react'
 import './RefsSidebar.less'
 
 interface RefsSidebarProps {
@@ -14,14 +14,14 @@ const RefsSidebar: React.FC<RefsSidebarProps> = ({ isOpen = false, onClose, refe
     <div className={`refs-sidebar ${isOpen ? 'open' : ''}`}>
       <div className="sidebar-header">
         <h3>参考资料</h3>
-        <Button type="text" onClick={onClose}>
+        <Button variant="ghost" onClick={onClose}>
           关闭
         </Button>
       </div>
       <div className="sidebar-content">
         {references.map((ref, index) => (
           <div key={index} className="ref-item">
-            <BookOutlined />
+            <Book className="h-4 w-4" />
             <div className="ref-details">
               <div className="ref-title">{ref.title}</div>
               <div className="ref-source">{ref.source}</div>

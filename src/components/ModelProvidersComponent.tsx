@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from 'react'
-import { Table, Button, message, Popconfirm } from 'antd'
+import { Button } from '@/components/ui/button'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from '@/components/ui/table'
+import { message } from '@/utils/toast'
 import { agentApi } from '@/apis/agent_api'
 import { modelIcons } from '@/utils/modelIcon'
 import './ModelProvidersComponent.less'
@@ -34,50 +43,52 @@ const ModelProvidersComponent: React.FC = () => {
     }
   }
 
-  const columns = [
-    {
-      title: 'Provider',
-      dataIndex: 'provider',
-      key: 'provider',
-      render: (text: string) => (
-        <>
-          <img src={modelIcons[text] || modelIcons.default} alt={text} className="provider-icon" />
-          {text}
-        </>
-      )
-    },
-    {
-      title: 'Enabled Models',
-      dataIndex: 'enabled_models',
-      key: 'enabled_models',
-      render: (models: string[]) => models.join(', ')
-    },
-    {
-      title: 'Available Models',
-      dataIndex: 'available_models',
-      key: 'available_models',
-      render: (models: string[]) => models.join(', ')
-    },
-    {
-      title: 'Action',
-      key: 'action',
-      render: (_: any, record: any) => (
-        <Button onClick={() => handleUpdate(record.provider, record.available_models)}>
-          Enable All
-        </Button>
-      )
-    }
-  ]
+  const providerList = Object.values(providers)
 
   return (
     <div className="model-providers-container">
-      <Table
-        columns={columns}
-        dataSource={Object.values(providers)}
-        rowKey="provider"
-        loading={loading}
-        pagination={false}
-      />
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Provider</TableHead>
+            <TableHead>Enabled Models</TableHead>
+            <TableHead>Available Models</TableHead>
+            <TableHead>Action</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {providerList.map((provider: any) => (
+            <TableRow key={provider.provider}>
+              <TableCell>
+                <div className="flex items-center gap-2">
+                  <img
+                    src={modelIcons[provider.provider] || modelIcons.default}
+                    alt={provider.provider}
+                    className="provider-icon h-6 w-6"
+                  />
+                  {provider.provider}
+                </div>
+              </TableCell>
+              <TableCell>{provider.enabled_models?.join(', ') || 'None'}</TableCell>
+              <TableCell>{provider.available_models?.join(', ') || 'None'}</TableCell>
+              <TableCell>
+                <Button
+                  onClick={() => handleUpdate(provider.provider, provider.available_models || [])}
+                  variant="outline"
+                  size="sm"
+                >
+                  Enable All
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      {loading && (
+        <div className="flex justify-center py-4">
+          <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+        </div>
+      )}
     </div>
   )
 }

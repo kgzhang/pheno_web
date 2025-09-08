@@ -1,12 +1,7 @@
 import React, { useState, useMemo } from 'react'
-import { Modal, Progress } from 'antd'
-import {
-  FileTextOutlined,
-  FileOutlined,
-  DownOutlined,
-  EyeOutlined,
-  DatabaseOutlined
-} from '@ant-design/icons'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { Progress } from '@/components/ui/progress'
+import { FileText, File, ChevronDown, Eye } from 'lucide-react'
 import './KnowledgeBaseResult.less'
 
 interface KnowledgeBaseResultProps {
@@ -49,7 +44,7 @@ const KnowledgeBaseResult: React.FC<KnowledgeBaseResultProps> = ({ data }) => {
     <div className="knowledge-base-result">
       <div className="kb-header">
         <h4>
-          <FileTextOutlined /> 知识库检索结果
+          <FileText className="h-4 w-4 mr-2 inline" /> 知识库检索结果
         </h4>
         <div className="result-summary">
           找到 {data.length} 个相关文档片段，来自 {fileGroups.length} 个文件
@@ -63,12 +58,14 @@ const KnowledgeBaseResult: React.FC<KnowledgeBaseResultProps> = ({ data }) => {
               onClick={() => toggleFile(group.filename)}
             >
               <div className="file-info">
-                <FileOutlined />
+                <File className="h-4 w-4 mr-2" />
                 <span className="file-name">{group.filename}</span>
                 <span className="chunk-count">{group.chunks.length} chunks</span>
               </div>
               <div className="expand-icon">
-                <DownOutlined className={expandedFiles.has(group.filename) ? 'rotated' : ''} />
+                <ChevronDown
+                  className={`h-4 w-4 transition-transform ${expandedFiles.has(group.filename) ? 'rotate-180' : ''}`}
+                />
               </div>
             </div>
             {expandedFiles.has(group.filename) && (
@@ -90,7 +87,7 @@ const KnowledgeBaseResult: React.FC<KnowledgeBaseResultProps> = ({ data }) => {
                         )}
                       </div>
                       <span className="chunk-preview">{chunk.content.substring(0, 100)}...</span>
-                      <EyeOutlined className="view-icon" />
+                      <Eye className="view-icon h-4 w-4" />
                     </div>
                   </div>
                 ))}
@@ -99,42 +96,41 @@ const KnowledgeBaseResult: React.FC<KnowledgeBaseResultProps> = ({ data }) => {
           </div>
         ))}
       </div>
-      <Modal
-        open={modalVisible}
-        title={`文档片段 #${selectedChunk?.index} - ${selectedChunk?.data?.metadata?.source}`}
-        width={800}
-        footer={null}
-        onCancel={() => setModalVisible(false)}
-      >
-        {selectedChunk && (
-          <div className="chunk-detail">
-            <div className="detail-header">
-              <div className="detail-scores">
-                <div className="score-card">
-                  <div className="score-label">相似度分数</div>
-                  <div className="score-value-large">
-                    {(selectedChunk.data.score * 100).toFixed(1)}%
-                  </div>
-                  <Progress percent={selectedChunk.data.score * 100} showInfo={false} />
-                </div>
-                {selectedChunk.data.rerank_score && (
+      <Dialog open={modalVisible} onOpenChange={setModalVisible}>
+        <DialogContent className="max-w-4xl">
+          <h3 className="text-lg font-semibold">
+            文档片段 #{selectedChunk?.index} - {selectedChunk?.data?.metadata?.source}
+          </h3>
+          {selectedChunk && (
+            <div className="chunk-detail">
+              <div className="detail-header">
+                <div className="detail-scores">
                   <div className="score-card">
-                    <div className="score-label">重排序分数</div>
+                    <div className="score-label">相似度分数</div>
                     <div className="score-value-large">
-                      {(selectedChunk.data.rerank_score * 100).toFixed(1)}%
+                      {(selectedChunk.data.score * 100).toFixed(1)}%
                     </div>
-                    <Progress percent={selectedChunk.data.rerank_score * 100} showInfo={false} />
+                    <Progress value={selectedChunk.data.score * 100} className="h-2" />
                   </div>
-                )}
+                  {selectedChunk.data.rerank_score && (
+                    <div className="score-card">
+                      <div className="score-label">重排序分数</div>
+                      <div className="score-value-large">
+                        {(selectedChunk.data.rerank_score * 100).toFixed(1)}%
+                      </div>
+                      <Progress value={selectedChunk.data.rerank_score * 100} className="h-2" />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="detail-content">
+                <h5 className="font-medium mb-2">文档内容</h5>
+                <div className="content-text">{selectedChunk.data.content}</div>
               </div>
             </div>
-            <div className="detail-content">
-              <h5>文档内容</h5>
-              <div className="content-text">{selectedChunk.data.content}</div>
-            </div>
-          </div>
-        )}
-      </Modal>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

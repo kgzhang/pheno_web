@@ -12,7 +12,7 @@ interface ToolResultRendererProps {
 
 const ToolResultRenderer: React.FC<ToolResultRendererProps> = ({ toolName, resultContent }) => {
   const { availableTools } = useAgentStore()
-  const tool = availableTools[toolName]
+  const tool = availableTools[toolName as keyof typeof availableTools]
 
   const parsedData = typeof resultContent === 'string' ? JSON.parse(resultContent) : resultContent
 

@@ -1,6 +1,9 @@
-import { Database, Zap } from 'lucide-react'
-import { ThunderboltOutlined } from '@ant-design/icons'
-import { FC } from 'react'
+import { Database, Zap, Bolt } from 'lucide-react'
+import type { FC } from 'react'
+
+interface IconProps {
+  className?: string
+}
 
 export const getKbTypeLabel = (type: string): string => {
   const labels: Record<string, string> = {
@@ -11,11 +14,11 @@ export const getKbTypeLabel = (type: string): string => {
   return labels[type] || type
 }
 
-export const getKbTypeIcon = (type: string): FC => {
-  const icons: Record<string, FC> = {
+export const getKbTypeIcon = (type: string): FC<IconProps> => {
+  const icons: Record<string, FC<IconProps>> = {
     lightrag: Database,
     chroma: Zap,
-    milvus: ThunderboltOutlined
+    milvus: Bolt
   }
   return icons[type] || Database
 }

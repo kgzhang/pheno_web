@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Modal, Input, Select, Tag, message, Spin } from 'antd'
-import { BookPlus, Database, Zap } from 'lucide-react'
-import { ThunderboltOutlined } from '@ant-design/icons'
+import { Button } from '@/components/ui/button'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter
+} from '@/components/ui/dialog'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from '@/components/ui/select'
+import { Badge } from '@/components/ui/badge'
+import { toast } from '@/utils/toast'
+import { BookPlus } from 'lucide-react'
 import HeaderComponent from '@/components/HeaderComponent'
 import ModelSelectorComponent from '@/components/ModelSelectorComponent'
 import { useConfigStore } from '@/stores/configStore'
@@ -10,7 +26,7 @@ import { databaseApi, typeApi } from '@/apis/knowledge_api'
 import { getKbTypeIcon, getKbTypeLabel, getKbTypeColor } from '@/utils/kb_utils'
 import './DataBaseView.less'
 
-const { TextArea } = Input
+import { Textarea } from '@/components/ui/textarea'
 
 const DataBaseView: React.FC = () => {
   const navigate = useNavigate()
@@ -46,7 +62,7 @@ const DataBaseView: React.FC = () => {
         )
       )
     } catch (error: any) {
-      message.error(error.message || '加载数据库列表失败')
+      toast.error(error.message || '加载数据库列表失败')
     } finally {
       setLoading(false)
     }
@@ -59,7 +75,7 @@ const DataBaseView: React.FC = () => {
 
   const createDatabase = async () => {
     if (!newDatabase.name?.trim()) {
-      message.error('数据库名称不能为空')
+      toast.error('数据库名称不能为空')
       return
     }
     setCreating(true)
@@ -74,11 +90,11 @@ const DataBaseView: React.FC = () => {
         },
         llm_info: newDatabase.llm_info
       })
-      message.success('创建成功')
+      toast.success('创建成功')
       setOpenNewDatabaseModel(false)
       loadDatabases()
     } catch (error: any) {
-      message.error(error.message || '创建失败')
+      toast.error(error.message || '创建失败')
     } finally {
       setCreating(false)
     }
@@ -88,85 +104,125 @@ const DataBaseView: React.FC = () => {
     <div className="database-container layout-container">
       <HeaderComponent title="文档知识库">
         <template slot="actions">
-          <Button type="primary" onClick={() => setOpenNewDatabaseModel(true)}>
-            新建知识库
-          </Button>
+          <Button onClick={() => setOpenNewDatabaseModel(true)}>新建知识库</Button>
         </template>
       </HeaderComponent>
-      <Modal
-        open={openNewDatabaseModel}
-        title="新建知识库"
-        onOk={createDatabase}
-        onCancel={() => setOpenNewDatabaseModel(false)}
-        width={800}
-        confirmLoading={creating}
-      >
-        <h3>
-          知识库类型<span style={{ color: 'red' }}>*</span>
-        </h3>
-        <div className="kb-type-cards">
-          {Object.entries(supportedKbTypes).map(([key, value]: [string, any]) => (
-            <div
-              key={key}
-              className={`kb-type-card ${newDatabase.kb_type === key ? 'active' : ''}`}
-              onClick={() => setNewDatabase({ ...newDatabase, kb_type: key })}
-            >
-              <div className="card-header">
-                {React.createElement(getKbTypeIcon(key), { className: 'type-icon' })}
-                <span className="type-title">{getKbTypeLabel(key)}</span>
+      <Dialog open={openNewDatabaseModel} onOpenChange={setOpenNewDatabaseModel}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>新建知识库</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <h3 className="font-medium mb-2">
+                知识库类型<span className="text-red-500">*</span>
+              </h3>
+              <div className="kb-type-cards">
+                {Object.entries(supportedKbTypes).map(([key, value]: [string, any]) => (
+                  <div
+                    key={key}
+                    className={`kb-type-card ${newDatabase.kb_type === key ? 'active' : ''}`}
+                    onClick={() => setNewDatabase({ ...newDatabase, kb_type: key })}
+                  >
+                    <div className="card-header">
+                      {React.createElement(getKbTypeIcon(key), { className: 'type-icon' })}
+                      <span className="type-title">{getKbTypeLabel(key)}</span>
+                    </div>
+                    <div className="card-description">{value.description}</div>
+                  </div>
+                ))}
               </div>
-              <div className="card-description">{value.description}</div>
             </div>
-          ))}
-        </div>
-        <h3>
-          知识库名称<span style={{ color: 'red' }}>*</span>
-        </h3>
-        <Input
-          value={newDatabase.name}
-          onChange={(e) => setNewDatabase({ ...newDatabase, name: e.target.value })}
-          placeholder="新建知识库名称"
-          size="large"
-        />
-        <h3>嵌入模型</h3>
-        <Select
-          value={newDatabase.embed_model_name}
-          options={embedModelOptions}
-          style={{ width: '100%' }}
-          size="large"
-          onChange={(value) => setNewDatabase({ ...newDatabase, embed_model_name: value })}
-        />
-        {newDatabase.kb_type === 'lightrag' && (
-          <>
-            <h3 style={{ marginTop: 20 }}>语言</h3>
-            <Select
-              value={newDatabase.language}
-              options={languageOptions}
-              style={{ width: '100%' }}
-              size="large"
-              onChange={(value) => setNewDatabase({ ...newDatabase, language: value })}
-            />
-            <h3 style={{ marginTop: 20 }}>语言模型 (LLM)</h3>
-            <ModelSelectorComponent
-              model_name={newDatabase.llm_info.model_name || '请选择模型'}
-              model_provider={newDatabase.llm_info.provider || ''}
-              onSelectModel={({ provider, name }) =>
-                setNewDatabase({ ...newDatabase, llm_info: { provider, name } })
-              }
-            />
-          </>
-        )}
-        <h3 style={{ marginTop: 20 }}>知识库描述</h3>
-        <TextArea
-          value={newDatabase.description}
-          onChange={(e) => setNewDatabase({ ...newDatabase, description: e.target.value })}
-          placeholder="新建知识库描述"
-          autoSize={{ minRows: 5, maxRows: 10 }}
-        />
-      </Modal>
+
+            <div>
+              <h3 className="font-medium mb-2">
+                知识库名称<span className="text-red-500">*</span>
+              </h3>
+              <Input
+                value={newDatabase.name}
+                onChange={(e) => setNewDatabase({ ...newDatabase, name: e.target.value })}
+                placeholder="新建知识库名称"
+              />
+            </div>
+
+            <div>
+              <h3 className="font-medium mb-2">嵌入模型</h3>
+              <Select
+                value={newDatabase.embed_model_name}
+                onValueChange={(value) =>
+                  setNewDatabase({ ...newDatabase, embed_model_name: value })
+                }
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="选择嵌入模型" />
+                </SelectTrigger>
+                <SelectContent>
+                  {embedModelOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {newDatabase.kb_type === 'lightrag' && (
+              <>
+                <div>
+                  <h3 className="font-medium mb-2">语言</h3>
+                  <Select
+                    value={newDatabase.language}
+                    onValueChange={(value) => setNewDatabase({ ...newDatabase, language: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="选择语言" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {languageOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <h3 className="font-medium mb-2">语言模型 (LLM)</h3>
+                  <ModelSelectorComponent
+                    model_name={newDatabase.llm_info.model_name || '请选择模型'}
+                    model_provider={newDatabase.llm_info.provider || ''}
+                    onSelectModel={({ provider, name }) =>
+                      setNewDatabase({ ...newDatabase, llm_info: { provider, name } })
+                    }
+                  />
+                </div>
+              </>
+            )}
+
+            <div>
+              <h3 className="font-medium mb-2">知识库描述</h3>
+              <Textarea
+                value={newDatabase.description}
+                onChange={(e) => setNewDatabase({ ...newDatabase, description: e.target.value })}
+                placeholder="新建知识库描述"
+                className="min-h-[120px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpenNewDatabaseModel(false)}>
+              取消
+            </Button>
+            <Button onClick={createDatabase} disabled={creating}>
+              {creating ? '创建中...' : '创建'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       {loading ? (
         <div className="loading-container">
-          <Spin size="large" />
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
           <p>正在加载知识库...</p>
         </div>
       ) : (
@@ -201,10 +257,10 @@ const DataBaseView: React.FC = () => {
               </div>
               <p className="description">{db.description || '暂无描述'}</p>
               <div className="tags">
-                <Tag color="blue">{db.embed_info?.name}</Tag>
-                <Tag color={getKbTypeColor(db.kb_type || 'lightrag')}>
+                <Badge variant="secondary">{db.embed_info?.name}</Badge>
+                <Badge variant="outline" className={getKbTypeColor(db.kb_type || 'lightrag')}>
                   {getKbTypeLabel(db.kb_type || 'lightrag')}
-                </Tag>
+                </Badge>
               </div>
             </div>
           ))}

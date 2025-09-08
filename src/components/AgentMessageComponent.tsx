@@ -1,19 +1,15 @@
 import React, { useState } from 'react'
-import { Collapse } from 'antd'
-import { CaretRightOutlined } from '@ant-design/icons'
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible'
 import RefsComponent from './RefsComponent'
-import { Loader, CircleCheckBig } from 'lucide-react'
+import { Loader, CircleCheckBig, ChevronDown } from 'lucide-react'
 import { ToolResultRenderer } from './ToolCallingResult'
 import { useAgentStore } from '@/stores/agentStore'
 import { MdPreview } from 'md-editor-rt'
 import 'md-editor-rt/lib/preview.css'
 import './AgentMessageComponent.less'
 
-const { Panel } = Collapse
-
 interface AgentMessageComponentProps {
   message: any
-  isProcessing?: boolean
   debugMode?: boolean
   showRefs?: ('model' | 'copy' | 'retry')[]
   onRetry?: () => void
@@ -21,7 +17,6 @@ interface AgentMessageComponentProps {
 
 const AgentMessageComponent: React.FC<AgentMessageComponentProps> = ({
   message,
-  isProcessing,
   debugMode,
   showRefs,
   onRetry
@@ -52,11 +47,15 @@ const AgentMessageComponent: React.FC<AgentMessageComponentProps> = ({
       ) : (
         <div className="assistant-message">
           {message.additional_kwargs?.reasoning_content && (
-            <Collapse ghost>
-              <Panel header="推理过程" key="1">
-                <p>{message.additional_kwargs.reasoning_content}</p>
-              </Panel>
-            </Collapse>
+            <Collapsible className="w-full">
+              <CollapsibleTrigger className="flex items-center gap-2 py-2 font-medium">
+                <ChevronDown className="h-4 w-4 transition-transform data-[state=open]:rotate-180" />
+                推理过程
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <p className="pt-2">{message.additional_kwargs.reasoning_content}</p>
+              </CollapsibleContent>
+            </Collapsible>
           )}
           <MdPreview modelValue={message.content} />
           {message.tool_calls?.map((toolCall: any) => (
