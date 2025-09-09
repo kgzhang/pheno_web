@@ -67,3 +67,31 @@ export default tseslint.config([
   },
 ])
 ```
+
+## 环境变量配置
+
+项目使用环境变量来配置 API 基础 URL。复制 `.env.example` 文件为 `.env` 并根据需要修改：
+
+```bash
+# 复制环境变量示例文件
+cp .env.example .env
+
+# 编辑 .env 文件，修改 API URL
+VITE_API_URL=http://0.0.0.0:8000/v1/
+```
+
+可用的环境变量：
+- `VITE_API_URL`: API 基础 URL，默认为 `http://0.0.0.0:8000/v1/`
+
+## 开发
+
+```bash
+# 安装依赖
+pnpm install
+
+# 启动开发服务器
+pnpm dev
+
+# 构建生产版本
+pnpm build
+```

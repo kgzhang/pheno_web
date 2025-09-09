@@ -21,14 +21,14 @@ export const useInfoStore = create<InfoState>((set, get) => ({
 
   organization: () =>
     get().infoConfig.organization || {
-      name: '江南语析',
+      name: '病原AI',
       logo: '/favicon.svg',
       avatar: '/avatar.jpg'
     },
   branding: () =>
     get().infoConfig.branding || {
-      name: 'Yuxi-Know',
-      title: 'Yuxi-Know',
+      name: 'PathogenAI',
+      title: 'PathogenAI',
       subtitle: '大模型驱动的知识库管理工具',
       description: '结合知识库与知识图谱，提供更准确、更全面的回答'
     },
@@ -36,7 +36,7 @@ export const useInfoStore = create<InfoState>((set, get) => ({
     get().infoConfig.features || ['📚 灵活知识库', '🕸️ 知识图谱集成', '🤖 多模型支持'],
   footer: () =>
     get().infoConfig.footer || {
-      copyright: '© 江南语析 2025 [WIP] v0.12.138'
+      copyright: '© 病原AI 2025 [WIP] v0.12.138'
     },
 
   setInfoConfig: (newConfig) => {

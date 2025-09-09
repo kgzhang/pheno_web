@@ -1,5 +1,6 @@
 import { useUserStore, checkAdminPermission, checkSuperAdminPermission } from '@/stores/userStore'
 import { message } from '@/utils/toast'
+import { API_CONFIG } from '@/config/api'
 
 export async function apiRequest(
   url: string,
@@ -7,6 +8,9 @@ export async function apiRequest(
   requiresAuth = true
 ): Promise<any> {
   try {
+    // 构建完整的 URL
+    const fullUrl = API_CONFIG.getFullUrl(url)
+
     const requestOptions: RequestInit = {
       ...options,
       headers: {
@@ -23,7 +27,7 @@ export async function apiRequest(
       Object.assign(requestOptions.headers!, getAuthHeaders())
     }
 
-    const response = await fetch(url, requestOptions)
+    const response = await fetch(fullUrl, requestOptions)
 
     if (!response.ok) {
       let errorMessage = `请求失败: ${response.status}, ${response.statusText}`

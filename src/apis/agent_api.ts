@@ -1,17 +1,7 @@
 import { apiGet, apiPost, apiDelete, apiPut, apiAdminGet, apiAdminPost } from './base'
-import { useUserStore } from '@/stores/userStore'
 
 export const agentApi = {
-  sendAgentMessage: (agentId: string, data: any) => {
-    return fetch(`/api/chat/agent/${agentId}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...useUserStore.getState().getAuthHeaders()
-      },
-      body: JSON.stringify(data)
-    })
-  },
+  sendAgentMessage: (agentId: string, data: any) => apiPost(`/api/chat/agent/${agentId}`, data),
   simpleCall: (query: string) => apiPost('/api/chat/call', { query }),
   getDefaultAgent: () => apiGet('/api/chat/default_agent'),
   getAgents: () => apiGet('/api/chat/agent'),
