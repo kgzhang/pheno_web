@@ -1,7 +1,7 @@
 // API 配置
 export const API_CONFIG = {
   // 基础 API URL，可以通过环境变量 VITE_API_URL 覆盖
-  BASE_URL: import.meta.env.VITE_API_URL || 'http://0.0.0.0:8000/v1/',
+  BASE_URL: import.meta.env.VITE_API_URL || 'http://localhost:8000/api/v1/',
 
   // 获取完整的 API URL
   getFullUrl: (path: string): string => {

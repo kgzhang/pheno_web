@@ -19,24 +19,24 @@ export const lightragApi = {
       max_depth: max_depth.toString(),
       max_nodes: max_nodes.toString()
     })
-    return await apiGet(`/api/graph/lightrag/subgraph?${queryParams.toString()}`, {}, true)
+    return await apiGet(`/graph/lightrag/subgraph?${queryParams.toString()}`, {}, true)
   },
   getDatabases: async () => {
-    return await apiGet('/api/graph/lightrag/databases', {}, true)
+    return await apiGet('/graph/lightrag/databases', {}, true)
   },
   getLabels: async (db_id: string) => {
     if (!db_id) {
       throw new Error('db_id is required')
     }
     const queryParams = new URLSearchParams({ db_id })
-    return await apiGet(`/api/graph/lightrag/labels?${queryParams.toString()}`, {}, true)
+    return await apiGet(`/graph/lightrag/labels?${queryParams.toString()}`, {}, true)
   },
   getStats: async (db_id: string) => {
     if (!db_id) {
       throw new Error('db_id is required')
     }
     const queryParams = new URLSearchParams({ db_id })
-    return await apiGet(`/api/graph/lightrag/stats?${queryParams.toString()}`, {}, true)
+    return await apiGet(`/graph/lightrag/stats?${queryParams.toString()}`, {}, true)
   }
 }
 
@@ -46,23 +46,23 @@ export const neo4jApi = {
       kgdb_name,
       num: num.toString()
     })
-    return await apiGet(`/api/graph/neo4j/nodes?${queryParams.toString()}`, {}, true)
+    return await apiGet(`/graph/neo4j/nodes?${queryParams.toString()}`, {}, true)
   },
   queryNode: async (entity_name: string) => {
     if (!entity_name) {
       throw new Error('entity_name is required')
     }
     const queryParams = new URLSearchParams({ entity_name })
-    return await apiGet(`/api/graph/neo4j/node?${queryParams.toString()}`, {}, true)
+    return await apiGet(`/graph/neo4j/node?${queryParams.toString()}`, {}, true)
   },
   addEntities: async (file_path: string, kgdb_name = 'neo4j') => {
-    return await apiPost('/api/graph/neo4j/add-entities', { file_path, kgdb_name }, {}, true)
+    return await apiPost('/graph/neo4j/add-entities', { file_path, kgdb_name }, {}, true)
   },
   indexEntities: async (kgdb_name = 'neo4j') => {
-    return await apiPost('/api/graph/neo4j/index-entities', { kgdb_name }, {}, true)
+    return await apiPost('/graph/neo4j/index-entities', { kgdb_name }, {}, true)
   },
   getInfo: async () => {
-    return await apiGet('/api/graph/neo4j/info', {}, true)
+    return await apiGet('/graph/neo4j/info', {}, true)
   }
 }
 

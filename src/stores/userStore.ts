@@ -34,13 +34,15 @@ export const useUserStore = create<UserState>()(
 
       login: async (credentials) => {
         try {
-          const formData = new FormData()
-          formData.append('username', credentials.username)
-          formData.append('password', credentials.password)
-
-          const response = await fetch('/api/auth/token', {
+          const response = await fetch('http://localhost:8000/api/v1/auth/login', {
             method: 'POST',
-            body: formData
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              email: credentials.username,
+              password: credentials.password
+            })
           })
 
           if (!response.ok) {
@@ -50,10 +52,10 @@ export const useUserStore = create<UserState>()(
 
           const data = await response.json()
           set({
-            token: data.access_token,
-            userId: data.user_id,
-            username: data.username,
-            userRole: data.role
+            token: data.data.access_token,
+            userId: data.data.user_id,
+            username: data.data.name,
+            userRole: data.data.role
           })
           return true
         } catch (error) {
@@ -73,7 +75,7 @@ export const useUserStore = create<UserState>()(
 
       initialize: async (admin) => {
         try {
-          const response = await fetch('/api/auth/initialize', {
+          const response = await fetch('http://localhost:8000/api/v1/auth/initialize', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
@@ -102,7 +104,7 @@ export const useUserStore = create<UserState>()(
 
       checkFirstRun: async () => {
         try {
-          const response = await fetch('/api/auth/check-first-run')
+          const response = await fetch('http://localhost:8000/api/v1/auth/check-first-run')
           const data = await response.json()
           return data.first_run
         } catch (error) {
@@ -117,7 +119,7 @@ export const useUserStore = create<UserState>()(
 
       getUsers: async () => {
         try {
-          const response = await fetch('/api/auth/users', {
+          const response = await fetch('http://localhost:8000/api/v1/auth/users', {
             headers: get().getAuthHeaders()
           })
           if (!response.ok) {
@@ -132,7 +134,7 @@ export const useUserStore = create<UserState>()(
 
       createUser: async (userData) => {
         try {
-          const response = await fetch('/api/auth/users', {
+          const response = await fetch('http://localhost:8000/api/v1/auth/users', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
@@ -153,7 +155,7 @@ export const useUserStore = create<UserState>()(
 
       updateUser: async (userId, userData) => {
         try {
-          const response = await fetch(`/api/auth/users/${userId}`, {
+          const response = await fetch(`http://localhost:8000/api/v1/auth/users/${userId}`, {
             method: 'PUT',
             headers: {
               'Content-Type': 'application/json',
@@ -174,7 +176,7 @@ export const useUserStore = create<UserState>()(
 
       deleteUser: async (userId) => {
         try {
-          const response = await fetch(`/api/auth/users/${userId}`, {
+          const response = await fetch(`http://localhost:8000/api/v1/auth/users/${userId}`, {
             method: 'DELETE',
             headers: get().getAuthHeaders()
           })

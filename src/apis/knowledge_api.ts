@@ -2,52 +2,52 @@ import { apiAdminGet, apiAdminPost, apiAdminPut, apiAdminDelete } from './base'
 
 export const databaseApi = {
   getDatabases: async () => {
-    return apiAdminGet('/api/knowledge/databases')
+    return apiAdminGet('/knowledge/databases')
   },
   createDatabase: async (databaseData: any) => {
-    return apiAdminPost('/api/knowledge/databases', databaseData)
+    return apiAdminPost('/knowledge/databases', databaseData)
   },
   getDatabaseInfo: async (dbId: string) => {
-    return apiAdminGet(`/api/knowledge/databases/${dbId}`)
+    return apiAdminGet(`/knowledge/databases/${dbId}`)
   },
   updateDatabase: async (dbId: string, updateData: any) => {
-    return apiAdminPut(`/api/knowledge/databases/${dbId}`, updateData)
+    return apiAdminPut(`/knowledge/databases/${dbId}`, updateData)
   },
   deleteDatabase: async (dbId: string) => {
-    return apiAdminDelete(`/api/knowledge/databases/${dbId}`)
+    return apiAdminDelete(`/knowledge/databases/${dbId}`)
   }
 }
 
 export const documentApi = {
   addDocuments: async (dbId: string, items: any[], params = {}) => {
-    return apiAdminPost(`/api/knowledge/databases/${dbId}/documents`, {
+    return apiAdminPost(`/knowledge/databases/${dbId}/documents`, {
       items,
       params
     })
   },
   getDocumentInfo: async (dbId: string, docId: string) => {
-    return apiAdminGet(`/api/knowledge/databases/${dbId}/documents/${docId}`)
+    return apiAdminGet(`/knowledge/databases/${dbId}/documents/${docId}`)
   },
   deleteDocument: async (dbId: string, docId: string) => {
-    return apiAdminDelete(`/api/knowledge/databases/${dbId}/documents/${docId}`)
+    return apiAdminDelete(`/knowledge/databases/${dbId}/documents/${docId}`)
   }
 }
 
 export const queryApi = {
   queryKnowledgeBase: async (dbId: string, query: string, meta = {}) => {
-    return apiAdminPost(`/api/knowledge/databases/${dbId}/query`, {
+    return apiAdminPost(`/knowledge/databases/${dbId}/query`, {
       query,
       meta
     })
   },
   queryTest: async (dbId: string, query: string, meta = {}) => {
-    return apiAdminPost(`/api/knowledge/databases/${dbId}/query-test`, {
+    return apiAdminPost(`/knowledge/databases/${dbId}/query-test`, {
       query,
       meta
     })
   },
   getKnowledgeBaseQueryParams: async (dbId: string) => {
-    return apiAdminGet(`/api/knowledge/databases/${dbId}/query-params`)
+    return apiAdminGet(`/knowledge/databases/${dbId}/query-params`)
   }
 }
 
@@ -56,7 +56,7 @@ export const fileApi = {
     const formData = new FormData()
     formData.append('file', file)
 
-    const url = dbId ? `/api/knowledge/files/upload?db_id=${dbId}` : '/api/knowledge/files/upload'
+    const url = dbId ? `/knowledge/files/upload?db_id=${dbId}` : '/knowledge/files/upload'
 
     return apiAdminPost(url, formData, {
       headers: {
@@ -68,9 +68,9 @@ export const fileApi = {
 
 export const typeApi = {
   getKnowledgeBaseTypes: async () => {
-    return apiAdminGet('/api/knowledge/types')
+    return apiAdminGet('/knowledge/types')
   },
   getStatistics: async () => {
-    return apiAdminGet('/api/knowledge/stats')
+    return apiAdminGet('/knowledge/stats')
   }
 }

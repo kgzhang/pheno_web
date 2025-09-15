@@ -78,7 +78,7 @@ const LoginView: React.FC = () => {
 		try {
 			setHealthChecking(true);
 			const response = await healthApi.checkHealth();
-			if (response.status === "ok") {
+			if (response.success) {
 				setServerStatus("ok");
 			} else {
 				setServerStatus("error");
@@ -209,7 +209,7 @@ const LoginView: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				
+
 				{/* Login form section */}
 				<div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white">
 					<div className="w-full max-w-md">
@@ -221,7 +221,9 @@ const LoginView: React.FC = () => {
 						{isFirstRun ? (
 							<div className="space-y-6">
 								<div className="text-center">
-									<h2 className="text-xl font-semibold text-gray-900">系统初始化</h2>
+									<h2 className="text-xl font-semibold text-gray-900">
+										系统初始化
+									</h2>
 									<p className="text-gray-600 mt-2">
 										系统首次运行，请创建超级管理员账户：
 									</p>
@@ -236,7 +238,9 @@ const LoginView: React.FC = () => {
 											name="username"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel className="text-gray-700">用户名</FormLabel>
+													<FormLabel className="text-gray-700">
+														用户名
+													</FormLabel>
 													<FormControl>
 														<Input
 															placeholder="请输入用户名"
@@ -271,7 +275,9 @@ const LoginView: React.FC = () => {
 											name="confirmPassword"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel className="text-gray-700">确认密码</FormLabel>
+													<FormLabel className="text-gray-700">
+														确认密码
+													</FormLabel>
 													<FormControl>
 														<Input
 															type="password"
@@ -306,7 +312,9 @@ const LoginView: React.FC = () => {
 											name="username"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel className="text-gray-700">用户名</FormLabel>
+													<FormLabel className="text-gray-700">
+														用户名
+													</FormLabel>
 													<FormControl>
 														<Input
 															placeholder="请输入用户名"
