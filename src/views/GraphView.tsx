@@ -10,7 +10,6 @@ import {
 import { Upload } from 'lucide-react'
 import HeaderComponent from '@/components/HeaderComponent'
 import { neo4jApi } from '@/apis/graph_api'
-import './GraphView.less'
 
 const GraphView: React.FC = () => {
   const [graphData, setGraphData] = useState<{ nodes: any[]; edges: any[] }>({
@@ -51,7 +50,7 @@ const GraphView: React.FC = () => {
   }
 
   return (
-    <div className="graph-container layout-container">
+    <div className="flex flex-col h-screen bg-gray-50">
       <HeaderComponent title="图数据库">
         <div slot="actions">
           <Button onClick={() => setShowModal(true)}>
@@ -60,12 +59,12 @@ const GraphView: React.FC = () => {
           </Button>
         </div>
       </HeaderComponent>
-      <div className="container-outter">
-        <div className="flex items-center justify-center h-64 text-muted-foreground">
-          <div className="text-center">
-            <div className="text-2xl mb-2">📊</div>
-            <p>图形可视化功能需要重新实现</p>
-            <p className="text-sm text-muted-foreground mt-2">请使用其他图形库如Sigma.js或D3.js</p>
+      <div className="flex-1 overflow-hidden">
+        <div className="flex items-center justify-center h-full text-gray-500">
+          <div className="text-center p-8">
+            <div className="text-4xl mb-4">📊</div>
+            <p className="text-xl mb-2">图形可视化功能需要重新实现</p>
+            <p className="text-gray-600">请使用其他图形库如Sigma.js或D3.js</p>
           </div>
         </div>
       </div>
@@ -74,10 +73,10 @@ const GraphView: React.FC = () => {
           <DialogHeader>
             <DialogTitle>上传文件</DialogTitle>
           </DialogHeader>
-          <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-8 text-center">
-            <Upload className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
+            <Upload className="w-12 h-12 mx-auto mb-4 text-gray-500" />
             <p className="text-sm font-medium mb-2">点击或者把文件拖拽到这里上传</p>
-            <p className="text-xs text-muted-foreground">目前仅支持上传 jsonl 文件。</p>
+            <p className="text-xs text-gray-500">目前仅支持上传 jsonl 文件。</p>
             <input
               type="file"
               className="mt-4"

@@ -1,8 +1,6 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
 import { Book } from 'lucide-react'
-import './RefsSidebar.less'
-
 interface RefsSidebarProps {
   isOpen?: boolean
   onClose?: () => void

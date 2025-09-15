@@ -6,7 +6,6 @@ import AgentMessageComponent from './AgentMessageComponent'
 import MessageInputComponent from './MessageInputComponent'
 import { useAgentStore } from '@/stores/agentStore'
 import { threadApi, agentApi } from '@/apis'
-import './AgentChatComponent.less'
 
 interface AgentChatComponentProps {
   agentId?: string
@@ -73,7 +72,7 @@ const AgentChatComponent: React.FC<AgentChatComponentProps> = ({
   }
 
   return (
-    <div className="chat-container">
+    <div className="flex w-full h-full relative">
       <ChatSidebarComponent
         currentChatId={currentThreadId}
         chatsList={threads}
@@ -87,9 +86,9 @@ const AgentChatComponent: React.FC<AgentChatComponentProps> = ({
         onToggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
         onOpenAgentModal={onOpenAgentModal || (() => {})}
       />
-      <div className="chat">
-        <div className="chat-header">
-          <div className="header__left">
+      <div className="relative flex-1 flex flex-col overflow-x-hidden bg-white box-border overflow-y-scroll">
+        <div className="user-select-none sticky top-0 z-10 bg-white h-[var(--header-height)] flex justify-between items-center px-2 py-4 border-b border-gray-200">
+          <div className="flex items-center gap-2">
             {!isSidebarOpen && (
               <Button variant="ghost" size="icon" onClick={() => setIsSidebarOpen(true)}>
                 <PanelLeftOpen className="h-4 w-4" />
@@ -100,17 +99,17 @@ const AgentChatComponent: React.FC<AgentChatComponentProps> = ({
               新对话
             </Button>
           </div>
-          <div className="header__center">
+          <div className="flex items-center">
             {threads.find((t) => t.id === currentThreadId)?.title}
           </div>
-          <div className="header__right">{children}</div>
+          <div className="flex items-center">{children}</div>
         </div>
-        <div className="chat-box">
+        <div className="w-full max-w-4xl mx-auto flex-grow p-4 flex flex-col">
           {messages[currentThreadId || '']?.map((msg: any, index: number) => (
             <AgentMessageComponent key={index} message={msg} />
           ))}
         </div>
-        <div className="bottom">
+        <div className="sticky bottom-0 w-full mx-auto pt-1 px-4 bg-white">
           <MessageInputComponent
             value={userInput}
             onChange={setUserInput}

@@ -36,8 +36,6 @@ import { toast } from '@/utils/toast'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import './UserManagementComponent.less'
-
 const userSchema = z.object({
   username: z.string().min(1, '请输入用户名'),
   password: z.string().optional(),

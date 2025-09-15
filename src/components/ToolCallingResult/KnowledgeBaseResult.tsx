@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react'
 import { Dialog, DialogContent } from '@/components/ui/dialog'
 import { Progress } from '@/components/ui/progress'
 import { FileText, File, ChevronDown, Eye } from 'lucide-react'
-import './KnowledgeBaseResult.less'
-
 interface KnowledgeBaseResultProps {
   data: any[]
 }

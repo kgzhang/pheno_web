@@ -8,7 +8,6 @@ import AgentConfigSidebar from '@/components/AgentConfigSidebar'
 import { useUserStore } from '@/stores/userStore'
 import { useAgentStore } from '@/stores/agentStore'
 import { useInfoStore } from '@/stores/infoStore'
-import './AgentView.less'
 
 const AgentView: React.FC = () => {
   const { isAdmin } = useUserStore()
@@ -41,91 +40,97 @@ const AgentView: React.FC = () => {
   }
 
   return (
-    <div className="agent-view">
-      <div className="agent-view-header">
-        <div className="header-left">
-          <div className="header-item">
-            <span className="brandname">{branding()?.title}</span>
+    <div className="flex flex-col h-screen bg-gray-50">
+      {/* Header */}
+      <div className="flex items-center justify-between p-4 bg-white border-b border-gray-200">
+        <div className="flex items-center space-x-4">
+          <div className="text-xl font-bold text-gray-900">
+            {branding()?.title}
           </div>
-          <div className="header-item">
-            <Button
-              variant="outline"
-              className="header-button"
-              onClick={() => setAgentModalOpen(true)}
-            >
-              <Bot size={18} strokeWidth={1.75} />
-              选择：{selectedAgent()?.name || '选择智能体'}
-            </Button>
-          </div>
+          <Button
+            variant="outline"
+            className="flex items-center space-x-2"
+            onClick={() => setAgentModalOpen(true)}
+          >
+            <Bot size={18} strokeWidth={1.75} />
+            <span>选择：{selectedAgent()?.name || '选择智能体'}</span>
+          </Button>
         </div>
-        <div className="header-right">
-          <div className="header-item">
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            className="flex items-center space-x-2"
+            onClick={() => setIsConfigSidebarOpen(!isConfigSidebarOpen)}
+          >
+            <Settings className="h-4 w-4" />
+            <span>配置</span>
+          </Button>
+          {selectedAgentId && (
             <Button
               variant="outline"
-              className="header-button"
-              onClick={() => setIsConfigSidebarOpen(!isConfigSidebarOpen)}
+              className="flex items-center space-x-2"
+              onClick={goToAgentPage}
             >
-              <Settings className="h-4 w-4 mr-2" />
-              配置
+              <Link className="h-4 w-4" />
+              <span>独立页面</span>
             </Button>
-          </div>
-          {selectedAgentId && (
-            <div className="header-item">
-              <Button variant="outline" className="header-button" onClick={goToAgentPage}>
-                <Link className="h-4 w-4 mr-2" />
-                独立页面
-              </Button>
-            </div>
           )}
         </div>
       </div>
-      <div className="agent-view-body">
-        <Dialog open={agentModalOpen} onOpenChange={setAgentModalOpen}>
-          <DialogContent className="agent-modal max-w-4xl">
-            <h3 className="text-lg font-semibold mb-4">选择智能体</h3>
-            <div className="agent-modal-content">
-              <div className="agents-grid">
-                {Object.entries(agents).map(([id, agent]) => (
-                  <div
-                    key={id}
-                    className={`agent-card ${id === selectedAgentId ? 'selected' : ''}`}
-                    onClick={() => selectAgentFromModal(id)}
-                  >
-                    <div className="agent-card-header">
-                      <div className="agent-card-title">
-                        <span className="agent-card-name">{agent.name}</span>
-                        {id === defaultAgentId ? (
-                          <Star className="default-icon text-yellow-500 fill-current" />
-                        ) : (
-                          <StarOff
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setAsDefaultAgent(id)
-                            }}
-                            className="default-icon text-gray-400 hover:text-yellow-500 cursor-pointer"
-                          />
-                        )}
-                      </div>
-                    </div>
-                    <div className="agent-card-description">{agent.description}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-        <div className="content">
+      
+      {/* Main Content */}
+      <div className="flex-1 flex overflow-hidden">
+        {/* Chat Component */}
+        <div className="flex-1 flex flex-col">
           <AgentChatComponent
             singleMode={false}
             onOpenConfig={() => setIsConfigSidebarOpen(true)}
             onOpenAgentModal={() => setAgentModalOpen(true)}
           />
         </div>
+        
+        {/* Config Sidebar */}
         <AgentConfigSidebar
           isOpen={isConfigSidebarOpen}
           onClose={() => setIsConfigSidebarOpen(false)}
         />
       </div>
+      
+      {/* Agent Selection Modal */}
+      <Dialog open={agentModalOpen} onOpenChange={setAgentModalOpen}>
+        <DialogContent className="max-w-4xl">
+          <h3 className="text-lg font-semibold mb-4">选择智能体</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 max-h-[60vh] overflow-y-auto">
+            {Object.entries(agents).map(([id, agent]) => (
+              <div
+                key={id}
+                className={`border rounded-lg p-4 cursor-pointer transition-all ${
+                  id === selectedAgentId
+                    ? 'border-blue-500 bg-blue-50'
+                    : 'border-gray-200 hover:border-blue-300 hover:bg-gray-50'
+                }`}
+                onClick={() => selectAgentFromModal(id)}
+              >
+                <div className="flex justify-between items-start">
+                  <div className="font-medium text-gray-900">{agent.name}</div>
+                  {id === defaultAgentId ? (
+                    <Star className="text-yellow-500 fill-current" />
+                  ) : (
+                    <StarOff
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setAsDefaultAgent(id)
+                      }}
+                      className="text-gray-400 hover:text-yellow-500 cursor-pointer"
+                    />
+                  )}
+                </div>
+                <div className="mt-2 text-sm text-gray-600">{agent.description}</div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

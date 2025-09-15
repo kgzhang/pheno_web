@@ -1,8 +1,6 @@
 import React, { useMemo, useRef, useEffect } from 'react'
 import { Network } from 'lucide-react'
 import GraphContainer from '../GraphContainer'
-import './KnowledgeGraphResult.less'
-
 interface KnowledgeGraphResultProps {
   data: {
     triples?: [string, string, string][]

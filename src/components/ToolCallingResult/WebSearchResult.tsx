@@ -1,7 +1,5 @@
 import React from 'react'
 import { Globe } from 'lucide-react'
-import './WebSearchResult.less'
-
 interface WebSearchResultProps {
   data: {
     query: string

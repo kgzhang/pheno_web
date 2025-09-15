@@ -9,8 +9,6 @@ import {
 import { Loader2 } from 'lucide-react'
 import { useDatabaseStore } from '@/stores/databaseStore'
 import { getStatusText, formatStandardTime } from '@/utils/file_utils'
-import './FileDetailModal.less'
-
 const FileDetailModal: React.FC = () => {
   const { state, selectedFile, setSelectedFile } = useDatabaseStore((state) => ({
     state: state.state,

@@ -21,8 +21,6 @@ import { useUserStore } from '@/stores/userStore'
 import { useDatabaseStore } from '@/stores/databaseStore'
 import { useAgentStore } from '@/stores/agentStore'
 import { configApi } from '@/apis/system_api'
-import './DebugComponent.less'
-
 const logLevels = [
   { value: 'INFO', label: 'INFO' },
   { value: 'ERROR', label: 'ERROR' },

@@ -16,7 +16,6 @@ import ModelSelectorComponent from '@/components/ModelSelectorComponent'
 import { useConfigStore } from '@/stores/configStore'
 import { useUserStore } from '@/stores/userStore'
 import { configApi } from '@/apis/system_api'
-import './SettingView.less'
 
 const SettingView: React.FC = () => {
   const { config, setConfigValue, setConfigValues } = useConfigStore()
@@ -51,20 +50,20 @@ const SettingView: React.FC = () => {
   }
 
   return (
-    <div className="setting-container layout-container">
+    <div className="flex flex-col h-screen bg-gray-50">
       <HeaderComponent title="设置">
         <Button variant={isNeedRestart ? 'default' : 'outline'} onClick={sendRestart}>
           <RefreshCw className="h-4 w-4 mr-2" />
           {isNeedRestart ? '需要刷新' : '重新加载'}
         </Button>
       </HeaderComponent>
-      <div className="setting-container-body">
+      <div className="flex flex-1 overflow-hidden">
         {windowWidth > 520 && (
-          <div className="sider">
+          <div className="w-64 bg-white border-r border-gray-200 p-4 flex flex-col space-y-2">
             {isSuperAdmin() && (
               <Button
                 variant="ghost"
-                className={section === 'base' ? 'activesec' : ''}
+                className={`justify-start ${section === 'base' ? 'bg-gray-100' : ''}`}
                 onClick={() => setSection('base')}
               >
                 <Settings className="h-4 w-4 mr-2" />
@@ -74,7 +73,7 @@ const SettingView: React.FC = () => {
             {isSuperAdmin() && (
               <Button
                 variant="ghost"
-                className={section === 'model' ? 'activesec' : ''}
+                className={`justify-start ${section === 'model' ? 'bg-gray-100' : ''}`}
                 onClick={() => setSection('model')}
               >
                 <Code className="h-4 w-4 mr-2" />
@@ -84,7 +83,7 @@ const SettingView: React.FC = () => {
             {isAdmin() && (
               <Button
                 variant="ghost"
-                className={section === 'user' ? 'activesec' : ''}
+                className={`justify-start ${section === 'user' ? 'bg-gray-100' : ''}`}
                 onClick={() => setSection('user')}
               >
                 <User className="h-4 w-4 mr-2" />
@@ -93,13 +92,13 @@ const SettingView: React.FC = () => {
             )}
           </div>
         )}
-        <div className="setting">
+        <div className="flex-1 overflow-y-auto p-6">
           {(windowWidth <= 520 || section === 'base') && isSuperAdmin() && (
             <>
-              <h3>检索配置</h3>
-              <div className="section">
-                <div className="card card-select">
-                  <span className="label">对话模型</span>
+              <h3 className="text-lg font-medium mb-4">检索配置</h3>
+              <div className="space-y-4">
+                <div className="bg-white p-4 rounded-lg shadow">
+                  <span className="block text-sm font-medium mb-2">对话模型</span>
                   <ModelSelectorComponent
                     onSelectModel={({ provider, name }) =>
                       setConfigValues({ model_provider: provider, model_name: name })
@@ -108,13 +107,13 @@ const SettingView: React.FC = () => {
                     model_provider={config?.model_provider}
                   />
                 </div>
-                <div className="card card-select">
-                  <span className="label">{config?._config_items?.embed_model.des}</span>
+                <div className="bg-white p-4 rounded-lg shadow">
+                  <span className="block text-sm font-medium mb-2">{config?._config_items?.embed_model.des}</span>
                   <Select
                     value={config?.embed_model}
                     onValueChange={(value) => handleChange('embed_model', value)}
                   >
-                    <SelectTrigger className="w-[300px]">
+                    <SelectTrigger className="w-full max-w-xs">
                       <SelectValue placeholder="选择嵌入模型" />
                     </SelectTrigger>
                     <SelectContent>
@@ -126,13 +125,13 @@ const SettingView: React.FC = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="card card-select">
-                  <span className="label">{config?._config_items?.reranker.des}</span>
+                <div className="bg-white p-4 rounded-lg shadow">
+                  <span className="block text-sm font-medium mb-2">{config?._config_items?.reranker.des}</span>
                   <Select
                     value={config?.reranker}
                     onValueChange={(value) => handleChange('reranker', value)}
                   >
-                    <SelectTrigger className="w-[300px]">
+                    <SelectTrigger className="w-full max-w-xs">
                       <SelectValue placeholder="选择重排序模型" />
                     </SelectTrigger>
                     <SelectContent>
@@ -149,9 +148,9 @@ const SettingView: React.FC = () => {
           )}
           {(windowWidth <= 520 || section === 'model') && isSuperAdmin() && (
             <>
-              <h3>模型配置</h3>
-              <p>
-                请在 <code>src/.env</code> 文件中配置对应的 APIKEY，并重新启动服务
+              <h3 className="text-lg font-medium mb-4">模型配置</h3>
+              <p className="mb-4 text-gray-600">
+                请在 <code className="bg-gray-100 p-1 rounded">src/.env</code> 文件中配置对应的 APIKEY，并重新启动服务
               </p>
               <ModelProvidersComponent />
             </>

@@ -6,7 +6,6 @@ import { ToolResultRenderer } from './ToolCallingResult'
 import { useAgentStore } from '@/stores/agentStore'
 import { MdPreview } from 'md-editor-rt'
 import 'md-editor-rt/lib/preview.css'
-import './AgentMessageComponent.less'
 
 interface AgentMessageComponentProps {
   message: any
@@ -41,11 +40,15 @@ const AgentMessageComponent: React.FC<AgentMessageComponentProps> = ({
   }
 
   return (
-    <div className={`message-box ${message.type}`}>
+    <div className={`inline-block rounded-3xl my-3 p-2.5 px-5 select-text break-words text-[15px] leading-6 max-w-full ${
+      message.type === 'human'
+        ? 'text-white bg-blue-700 self-end'
+        : 'w-full text-left p-0 bg-transparent'
+    }`}>
       {message.type === 'human' ? (
-        <p className="message-text">{message.content}</p>
+        <p>{message.content}</p>
       ) : (
-        <div className="assistant-message">
+        <div className="w-full">
           {message.additional_kwargs?.reasoning_content && (
             <Collapsible className="w-full">
               <CollapsibleTrigger className="flex items-center gap-2 py-2 font-medium">
@@ -59,13 +62,13 @@ const AgentMessageComponent: React.FC<AgentMessageComponentProps> = ({
           )}
           <MdPreview modelValue={message.content} />
           {message.tool_calls?.map((toolCall: any) => (
-            <div key={toolCall.id} className="tool-call-container">
-              <div className="tool-header" onClick={() => toggleToolCall(toolCall.id)}>
+            <div key={toolCall.id} className="mt-2.5">
+              <div className="flex items-center gap-2 cursor-pointer" onClick={() => toggleToolCall(toolCall.id)}>
                 {toolCall.tool_call_result ? <CircleCheckBig /> : <Loader />}
                 <span>{getToolNameByToolCall(toolCall)}</span>
               </div>
               {expandedToolCalls.has(toolCall.id) && (
-                <div className="tool-content">
+                <div className="mt-2">
                   <pre>{JSON.stringify(toolCall.args || toolCall.function.arguments, null, 2)}</pre>
                   {toolCall.tool_call_result && (
                     <ToolResultRenderer
@@ -80,7 +83,7 @@ const AgentMessageComponent: React.FC<AgentMessageComponentProps> = ({
           {showRefs && <RefsComponent message={message} showRefs={showRefs} onRetry={onRetry} />}
         </div>
       )}
-      {debugMode && <pre className="status-info">{JSON.stringify(message, null, 2)}</pre>}
+      {debugMode && <pre>{JSON.stringify(message, null, 2)}</pre>}
     </div>
   )
 }

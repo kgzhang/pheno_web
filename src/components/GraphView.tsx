@@ -12,8 +12,6 @@ import { Slider } from '@/components/ui/slider'
 import { Switch } from '@/components/ui/switch'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
-import './GraphView.less'
-
 interface GraphViewProps {
   data?: any
   onGraphUpdate?: (config: any) => void

@@ -16,8 +16,6 @@ import { Settings, X } from 'lucide-react'
 import ModelSelectorComponent from './ModelSelectorComponent'
 import { useAgentStore } from '@/stores/agentStore'
 import { message } from '@/utils/toast'
-import './AgentConfigSidebar.less'
-
 interface AgentConfigSidebarProps {
   isOpen: boolean
   onClose: () => void

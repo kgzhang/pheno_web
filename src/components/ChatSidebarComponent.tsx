@@ -11,8 +11,6 @@ import dayjs from 'dayjs'
 import 'dayjs/locale/zh-cn'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { confirm } from '@/utils/confirm'
-import './ChatSidebarComponent.less'
-
 dayjs.extend(relativeTime)
 dayjs.locale('zh-cn')
 

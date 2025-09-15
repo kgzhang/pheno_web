@@ -12,10 +12,9 @@ import FileDetailModal from '@/components/FileDetailModal'
 import FileUploadModal from '@/components/FileUploadModal'
 import KnowledgeGraphSection from '@/components/KnowledgeGraphSection'
 import QuerySection from '@/components/QuerySection'
-import './DataBaseInfoView.less'
 
 const DataBaseInfoView: React.FC = () => {
-  const { database_id } = useParams<{ database_id: string }>()
+  const { databaseId } = useParams<{ databaseId: string }>()
   const {
     database,
     state,
@@ -46,11 +45,11 @@ const DataBaseInfoView: React.FC = () => {
   const resizeHandle = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    setDatabaseId(Number(database_id))
-    getDatabaseInfo(Number(database_id))
+    setDatabaseId(Number(databaseId))
+    getDatabaseInfo(Number(databaseId))
     startAutoRefresh()
     return () => stopAutoRefresh()
-  }, [database_id, setDatabaseId, getDatabaseInfo, startAutoRefresh, stopAutoRefresh])
+  }, [databaseId, setDatabaseId, getDatabaseInfo, startAutoRefresh, stopAutoRefresh])
 
   const handleMouseDown = () => {
     setIsDragging(true)
@@ -83,55 +82,63 @@ const DataBaseInfoView: React.FC = () => {
   }, [isDragging])
 
   return (
-    <div className="database-info-container">
+    <div className="flex flex-col h-screen bg-gray-50">
       <DatabaseHeader />
       <Dialog open={isGraphMaximized} onOpenChange={toggleGraphMaximize}>
-        <DialogContent className="full-modal max-w-none w-full h-full">
-          <div className="maximized-graph-header">
-            <h3>知识图谱 (最大化)</h3>
-            <Button variant="ghost" onClick={toggleGraphMaximize}>
-              <Minimize2 className="h-4 w-4 mr-2" /> 退出最大化
-            </Button>
-          </div>
-          <div className="maximized-graph-content">
-            {database.kb_type !== 'lightrag' ? (
-              <div className="graph-disabled">
-                <h4>知识图谱不可用</h4>
-                <p>
-                  当前知识库类型 "{getKbTypeLabel(database.kb_type || 'lightrag')}"
-                  不支持知识图谱功能。
-                </p>
-              </div>
-            ) : (
-              <KnowledgeGraphViewer
-                initialDatabaseId={databaseId?.toString()}
-                hideDbSelector={true}
-              />
-            )}
+        <DialogContent className="max-w-none w-full h-full p-0">
+          <div className="flex flex-col h-full">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h3 className="text-lg font-semibold">知识图谱 (最大化)</h3>
+              <Button variant="ghost" onClick={toggleGraphMaximize}>
+                <Minimize2 className="h-4 w-4 mr-2" /> 退出最大化
+              </Button>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              {database.kb_type !== 'lightrag' ? (
+                <div className="flex flex-col items-center justify-center h-full p-8 text-center">
+                  <h4 className="text-xl font-medium mb-2">知识图谱不可用</h4>
+                  <p className="text-gray-600">
+                    当前知识库类型 "{getKbTypeLabel(database.kb_type || 'lightrag')}"
+                    不支持知识图谱功能。
+                  </p>
+                </div>
+              ) : (
+                <KnowledgeGraphViewer
+                  initialDatabaseId={databaseId?.toString()}
+                  hideDbSelector={true}
+                />
+              )}
+            </div>
           </div>
         </DialogContent>
       </Dialog>
       <FileDetailModal />
       <FileUploadModal visible={addFilesModalVisible} onVisibleChange={setAddFilesModalVisible} />
-      <div className="unified-layout">
-        <div className="left-panel" style={{ width: `${leftPanelWidth}%` }}>
+      <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-col" style={{ width: `${leftPanelWidth}%` }}>
           <FileTable
             rightPanelVisible={state.rightPanelVisible}
             onShowAddFilesModal={() => setAddFilesModalVisible(true)}
             onToggleRightPanel={toggleRightPanel}
           />
         </div>
-        <div className="resize-handle" ref={resizeHandle} onMouseDown={handleMouseDown}></div>
         <div
-          className="right-panel"
+          className="w-2 cursor-col-resize bg-gray-200 hover:bg-blue-500 transition-colors"
+          ref={resizeHandle}
+          onMouseDown={handleMouseDown}
+        ></div>
+        <div
+          className="flex flex-col"
           style={{
             width: `${100 - leftPanelWidth}%`,
             display: state.rightPanelVisible ? 'flex' : 'none'
           }}
         >
-          <KnowledgeGraphSection />
-          <div className="resize-handle-horizontal"></div>
-          <QuerySection />
+          <div className="flex flex-col flex-1 overflow-hidden">
+            <KnowledgeGraphSection />
+            <div className="h-2 cursor-row-resize bg-gray-200 hover:bg-blue-500 transition-colors"></div>
+            <QuerySection />
+          </div>
         </div>
       </div>
     </div>

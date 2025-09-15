@@ -21,8 +21,6 @@ import { File, Link, Settings, CheckCircle2 } from 'lucide-react'
 import { useDatabaseStore } from '@/stores/databaseStore'
 import { ocrApi } from '@/apis/system_api'
 import { message } from '@/utils/toast'
-import './FileUploadModal.less'
-
 interface FileUploadModalProps {
   visible: boolean
   onVisibleChange: (visible: boolean) => void

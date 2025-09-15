@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { agentApi } from '@/apis/agent_api'
 import { modelIcons } from '@/utils/modelIcon'
-import './ModelSelectorComponent.less'
-
 interface ModelSelectorComponentProps {
   model_name?: string
   model_provider?: string

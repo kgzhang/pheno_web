@@ -3,8 +3,6 @@ import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip'
 import { Copy, RotateCcw } from 'lucide-react'
 import { modelIcons } from '@/utils/modelIcon'
-import './RefsComponent.less'
-
 interface RefsComponentProps {
   message: any
   showRefs?: ('model' | 'copy' | 'retry')[]

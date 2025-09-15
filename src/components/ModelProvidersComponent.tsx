@@ -11,8 +11,6 @@ import {
 import { message } from '@/utils/toast'
 import { agentApi } from '@/apis/agent_api'
 import { modelIcons } from '@/utils/modelIcon'
-import './ModelProvidersComponent.less'
-
 const ModelProvidersComponent: React.FC = () => {
   const [providers, setProviders] = useState<any>({})
   const [loading, setLoading] = useState(false)

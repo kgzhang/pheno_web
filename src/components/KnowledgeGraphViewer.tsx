@@ -6,8 +6,6 @@ import { NodeBorderProgram } from '@sigma/node-border'
 import EdgeCurveProgram, { EdgeCurvedArrowProgram } from '@sigma/edge-curve'
 import { lightragApi } from '@/apis/graph_api'
 import { useGraphStore } from '@/stores/graphStore'
-import './KnowledgeGraphViewer.less'
-
 interface KnowledgeGraphViewerProps {
   initialDatabaseId?: string
   hideDbSelector?: boolean

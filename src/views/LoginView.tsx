@@ -159,7 +159,7 @@ const LoginView: React.FC = () => {
 	return (
 		<div className={`min-h-screen ${serverStatus === "error" ? "pt-16" : ""}`}>
 			{serverStatus === "error" && (
-				<div className="fixed top-0 left-0 right-0 bg-destructive text-destructive-foreground p-4 z-50">
+				<div className="fixed top-0 left-0 right-0 bg-red-500 text-white p-4 z-50">
 					<div className="flex items-center justify-between max-w-7xl mx-auto">
 						<div className="flex items-center gap-3">
 							<AlertCircle className="h-5 w-5" />
@@ -172,15 +172,17 @@ const LoginView: React.FC = () => {
 							variant="ghost"
 							size="sm"
 							onClick={checkServerHealth}
-							loading={healthChecking}
+							disabled={healthChecking}
+							className="text-white hover:bg-white/20"
 						>
-							重试
+							{healthChecking ? "检查中..." : "重试"}
 						</Button>
 					</div>
 				</div>
 			)}
 			<div className="flex h-screen">
-				<div className="hidden lg:block flex-1 relative">
+				{/* Background image section - hidden on small screens */}
+				<div className="hidden lg:flex flex-1 relative">
 					<img
 						src={loginBgImage}
 						alt="登录背景"
@@ -207,18 +209,20 @@ const LoginView: React.FC = () => {
 						</div>
 					</div>
 				</div>
-				<div className="flex-1 flex items-center justify-center p-8">
+				
+				{/* Login form section */}
+				<div className="flex-1 flex items-center justify-center p-4 sm:p-8 bg-white">
 					<div className="w-full max-w-md">
 						<div className="text-center mb-8">
-							<h1 className="text-2xl font-bold">
+							<h1 className="text-2xl font-bold text-gray-900">
 								欢迎登录 {branding()?.name}
 							</h1>
 						</div>
 						{isFirstRun ? (
 							<div className="space-y-6">
 								<div className="text-center">
-									<h2 className="text-xl font-semibold">系统初始化</h2>
-									<p className="text-muted-foreground mt-2">
+									<h2 className="text-xl font-semibold text-gray-900">系统初始化</h2>
+									<p className="text-gray-600 mt-2">
 										系统首次运行，请创建超级管理员账户：
 									</p>
 								</div>
@@ -232,9 +236,13 @@ const LoginView: React.FC = () => {
 											name="username"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>用户名</FormLabel>
+													<FormLabel className="text-gray-700">用户名</FormLabel>
 													<FormControl>
-														<Input placeholder="请输入用户名" {...field} />
+														<Input
+															placeholder="请输入用户名"
+															{...field}
+															className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+														/>
 													</FormControl>
 													<FormMessage />
 												</FormItem>
@@ -245,12 +253,13 @@ const LoginView: React.FC = () => {
 											name="password"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>密码</FormLabel>
+													<FormLabel className="text-gray-700">密码</FormLabel>
 													<FormControl>
 														<Input
 															type="password"
 															placeholder="请输入密码"
 															{...field}
+															className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
 														/>
 													</FormControl>
 													<FormMessage />
@@ -262,20 +271,25 @@ const LoginView: React.FC = () => {
 											name="confirmPassword"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>确认密码</FormLabel>
+													<FormLabel className="text-gray-700">确认密码</FormLabel>
 													<FormControl>
 														<Input
 															type="password"
 															placeholder="请确认密码"
 															{...field}
+															className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
 														/>
 													</FormControl>
 													<FormMessage />
 												</FormItem>
 											)}
 										/>
-										<Button type="submit" className="w-full" loading={loading}>
-											创建管理员账户
+										<Button
+											type="submit"
+											className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+											disabled={loading}
+										>
+											{loading ? "创建中..." : "创建管理员账户"}
 										</Button>
 									</form>
 								</Form>
@@ -292,9 +306,13 @@ const LoginView: React.FC = () => {
 											name="username"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>用户名</FormLabel>
+													<FormLabel className="text-gray-700">用户名</FormLabel>
 													<FormControl>
-														<Input placeholder="请输入用户名" {...field} />
+														<Input
+															placeholder="请输入用户名"
+															{...field}
+															className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+														/>
 													</FormControl>
 													<FormMessage />
 												</FormItem>
@@ -305,12 +323,13 @@ const LoginView: React.FC = () => {
 											name="password"
 											render={({ field }) => (
 												<FormItem>
-													<FormLabel>密码</FormLabel>
+													<FormLabel className="text-gray-700">密码</FormLabel>
 													<FormControl>
 														<Input
 															type="password"
 															placeholder="请输入密码"
 															{...field}
+															className="border-gray-300 focus:ring-blue-500 focus:border-blue-500"
 														/>
 													</FormControl>
 													<FormMessage />
@@ -325,7 +344,7 @@ const LoginView: React.FC = () => {
 												/>
 												<label
 													htmlFor="remember"
-													className="text-sm cursor-pointer"
+													className="text-sm text-gray-700 cursor-pointer"
 												>
 													记住我
 												</label>
@@ -333,22 +352,26 @@ const LoginView: React.FC = () => {
 											<button
 												type="button"
 												onClick={showDevMessage}
-												className="text-sm text-primary hover:underline"
+												className="text-sm text-blue-600 hover:underline"
 											>
 												忘记密码?
 											</button>
 										</div>
-										<Button type="submit" className="w-full" loading={loading}>
-											登录
+										<Button
+											type="submit"
+											className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+											disabled={loading}
+										>
+											{loading ? "登录中..." : "登录"}
 										</Button>
 									</form>
 								</Form>
 								<div className="relative">
 									<div className="absolute inset-0 flex items-center">
-										<div className="w-full border-t" />
+										<div className="w-full border-t border-gray-300" />
 									</div>
 									<div className="relative flex justify-center text-xs uppercase">
-										<span className="bg-background px-2 text-muted-foreground">
+										<span className="bg-white px-2 text-gray-500">
 											其他登录方式
 										</span>
 									</div>
@@ -358,6 +381,7 @@ const LoginView: React.FC = () => {
 										variant="outline"
 										size="icon"
 										onClick={showDevMessage}
+										className="border-gray-300 text-gray-700 hover:bg-gray-50"
 									>
 										<MessageCircle className="h-4 w-4" />
 									</Button>
@@ -365,6 +389,7 @@ const LoginView: React.FC = () => {
 										variant="outline"
 										size="icon"
 										onClick={showDevMessage}
+										className="border-gray-300 text-gray-700 hover:bg-gray-50"
 									>
 										<QrCode className="h-4 w-4" />
 									</Button>
@@ -372,6 +397,7 @@ const LoginView: React.FC = () => {
 										variant="outline"
 										size="icon"
 										onClick={showDevMessage}
+										className="border-gray-300 text-gray-700 hover:bg-gray-50"
 									>
 										<Zap className="h-4 w-4" />
 									</Button>
@@ -379,16 +405,16 @@ const LoginView: React.FC = () => {
 							</div>
 						)}
 						{errorMessage && (
-							<div className="mt-4 p-3 bg-destructive/10 text-destructive text-sm rounded-md">
+							<div className="mt-4 p-3 bg-red-50 text-red-700 text-sm rounded-md border border-red-200">
 								{errorMessage}
 							</div>
 						)}
-						<div className="mt-8 flex justify-center gap-6 text-sm text-muted-foreground">
+						<div className="mt-8 flex justify-center gap-6 text-sm text-gray-600">
 							<a
 								href="https://github.com/xerrors"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="hover:underline"
+								className="hover:text-blue-600 hover:underline"
 							>
 								联系我们
 							</a>
@@ -396,7 +422,7 @@ const LoginView: React.FC = () => {
 								href="https://github.com/xerrors/PathogenAI"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="hover:underline"
+								className="hover:text-blue-600 hover:underline"
 							>
 								使用帮助
 							</a>
@@ -404,7 +430,7 @@ const LoginView: React.FC = () => {
 								href="https://github.com/xerrors/PathogenAI/blob/main/LICENSE"
 								target="_blank"
 								rel="noopener noreferrer"
-								className="hover:underline"
+								className="hover:text-blue-600 hover:underline"
 							>
 								隐私政策
 							</a>

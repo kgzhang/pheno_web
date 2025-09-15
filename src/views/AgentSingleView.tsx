@@ -2,17 +2,16 @@ import React from 'react'
 import { useParams } from 'react-router-dom'
 import AgentChatComponent from '@/components/AgentChatComponent'
 import UserInfoComponent from '@/components/UserInfoComponent'
-import './AgentSingleView.less'
 
 const AgentSingleView: React.FC = () => {
-  const { agent_id } = useParams<{ agent_id: string }>()
+  const { agentId } = useParams<{ agentId: string }>()
 
   return (
-    <div className="agent-single-view">
-      <AgentChatComponent agentId={agent_id} singleMode={true}>
-        <template slot="header-right">
+    <div className="flex flex-col h-screen">
+      <AgentChatComponent agentId={agentId} singleMode={true}>
+        <div slot="header-right">
           <UserInfoComponent />
-        </template>
+        </div>
       </AgentChatComponent>
     </div>
   )

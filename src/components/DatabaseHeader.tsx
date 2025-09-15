@@ -17,8 +17,6 @@ import { useDatabaseStore } from '@/stores/databaseStore'
 import { getKbTypeLabel, getKbTypeIcon, getKbTypeColor } from '@/utils/kb_utils'
 import { confirm } from '@/utils/confirm'
 import { message } from '@/utils/toast'
-import './DatabaseHeader.less'
-
 const DatabaseHeader: React.FC = () => {
   const navigate = useNavigate()
   const { database, state, updateDatabaseInfo, deleteDatabase: deleteDb } = useDatabaseStore()

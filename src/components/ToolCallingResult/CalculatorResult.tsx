@@ -1,7 +1,5 @@
 import React from 'react'
 import { Hash } from 'lucide-react'
-import './CalculatorResult.less'
-
 interface CalculatorResultProps {
   data: number
 }
